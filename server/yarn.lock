@@ -1176,7 +1176,7 @@ socket.io@^2.0.1:
     socket.io-client "2.5.0"
     socket.io-parser "~3.4.0"
 
-socket.io@^4.1.2:
+socket.io@^4.5.2:
   version "4.5.2"
   resolved "https://registry.yarnpkg.com/socket.io/-/socket.io-4.5.2.tgz#1eb25fd380ab3d63470aa8279f8e48d922d443ac"
   integrity sha512-6fCnk4ARMPZN448+SQcnn1u8OHUC72puJcNtSgg2xS34Cu7br1gQ09YKkO1PFfDn/wyUE9ZgMAwosJed003+NQ==
