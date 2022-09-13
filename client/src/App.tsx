@@ -1,18 +1,19 @@
 import React, { useEffect } from 'react';
-import { io } from "socket.io-client";
+import socketConnect from './utils/socket';
 
 function App(){
-  const connet = () => {
-    const socket = io("http://localhost:8080");
-
-    socket.on("connect",() => {
-      socket.emit("custom_event", { name: "yyy", year: 1})
-    });
+  const connect = async() => {
+    try { 
+      const socket = await socketConnect("http://localhost:8080")
+    } catch(err) {
+      console.log("Error: ", err)
+    }
   };
 
   useEffect(() => {
-    connet();
-  },[]);
+    connect();
+  }, []);
+
   return (
     <div>
       <h2>test1</h2>
