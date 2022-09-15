@@ -1,20 +1,26 @@
 import { io, Socket } from "socket.io-client";
 import { DefaultEventsMap } from "@socket.io/component-emitter";
 
-const socketConnect = (url: string): Promise<Socket<DefaultEventsMap, DefaultEventsMap>> => {
-  return new Promise((res, rej) => {
-    const socket = io(url)
+export namespace socketService {
+  let socket: Socket;
 
-    if(!socket) return rej();
+  export const getSocket = () => {
+    return socket;
+  };
 
-    socket.on("connet", () => {
-      res(socket as Socket);
+  export const connect = (url: string): Promise<Socket<DefaultEventsMap, DefaultEventsMap>> => {
+    return new Promise((res, rej) => {
+      socket = io(url);
+
+      if(!socket) return rej();
+
+      socket.on("connet", () => {
+        res(socket as Socket);
+      });
+
+      socket.on("connet_error", (err) => {
+        rej(err)
+      });
     });
-
-    socket.on("connet_error", (err) => {
-      rej(err)
-    });
-  });
+  }
 };
-
-export default socketConnect;
