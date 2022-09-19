@@ -5,7 +5,7 @@ import { ConnectedSocket, MessageBody, OnMessage, SocketController, SocketIO } f
 @SocketController()
 export class RoomController {
   
-  @OnMessage("join game")
+  @OnMessage("join_game")
   public async joinGame(
     @SocketIO() io: Server, 
     @ConnectedSocket() socket: Socket, 

@@ -3,7 +3,7 @@ import GameContext from "../../context/game/Game.context";
 import joinGameRoom from "../../utils/game";
 import { socketService } from "../../utils/socket";
 
-export const JoinRoom = () => {
+const JoinRoom = () => {
   const [roomId, setRoomId] = useState("");
   const [isJoining, setIsJoining] = useState(false);
 
@@ -19,11 +19,14 @@ export const JoinRoom = () => {
 
     setIsJoining(true);
     
+    let joined: boolean = false;
     try {
-      const joined = await joinGameRoom(socket, roomId)
+      joined = await joinGameRoom(socket, roomId)
     }catch(err) {
       alert(err);
     }
+
+    if(joined) setInRoom(true);
 
     setIsJoining(false);
   };
@@ -35,3 +38,5 @@ export const JoinRoom = () => {
     </form>
   );
 };
+
+export default JoinRoom;

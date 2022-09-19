@@ -1,0 +1,1 @@
+export type PlayMatrix = Array<Array<string | null>>;

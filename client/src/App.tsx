@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { JoinRoom } from './components/joinRoom';
+import Game from './components/game';
+import JoinRoom from './components/joinRoom';
 import GameContext from './context/game/Game.context';
 import { IGameContextProps } from './type/interfaces/game';
 import { socketService } from './utils/socket';
@@ -28,7 +29,7 @@ function App(){
     <GameContext.Provider value={gameContextValue}>
       <div>
         <h2>test1</h2>
-        <JoinRoom />
+        {!isInRoom ? <JoinRoom /> : <Game />}
       </div>
     </GameContext.Provider>
   );
