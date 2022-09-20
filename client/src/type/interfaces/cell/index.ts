@@ -1,8 +1,13 @@
-import { Col, Row } from "../../types/cell.type";
+interface IColRow {
+  col: number;
+  row: number;
+}
 
-export interface ICellProps {
+export interface ICellProps extends IColRow{
   value: string | null;
-  colIdx: number;
-  rowIdx: number;
-  updateMatrix: (col:Col, row:Row) => void;
+  updateMatrix: (iMatrix: IMatrix) => void;
+}
+
+export interface IMatrix extends IColRow{
+  symbol: 'x' | 'o';
 }

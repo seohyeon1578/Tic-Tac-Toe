@@ -3,10 +3,12 @@ import Game from './components/game';
 import JoinRoom from './components/joinRoom';
 import GameContext from './context/game/Game.context';
 import { IGameContextProps } from './type/interfaces/game';
+import { PlayerSymbol } from './type/types/game.type';
 import { socketService } from './utils/socket';
 
 function App(){
   const [isInRoom, setInRoom] = useState(false);
+  const [playerSymbol, setPlayerSymbol] = useState<PlayerSymbol>('x');
 
   const connect = async() => {
     try { 
@@ -22,7 +24,9 @@ function App(){
 
   const gameContextValue: IGameContextProps = {
     isInRoom,
-    setInRoom
+    setInRoom,
+    playerSymbol,
+    setPlayerSymbol,
   }
 
   return (

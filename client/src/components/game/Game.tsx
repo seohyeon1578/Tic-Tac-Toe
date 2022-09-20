@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Cell from "../cell";
 import * as G from './Game.style';
 import { PlayMatrix } from "../../type/types/game.type";
-import { Col, Row } from "../../type/types/cell.type";
+import { IMatrix } from "../../type/interfaces/cell";
+import GameContext from "../../context/game/Game.context";
 
 const Game = () => {
   const [matrix, setMatrix] = useState<PlayMatrix>([
@@ -10,9 +11,15 @@ const Game = () => {
     [null, null, null],
     [null, null, null],
   ]);
+  const {playerSymbol, setPlayerSymbol}= useContext(GameContext);
 
-  const updateMatrix = (col: Col, row: Row) => {
-    console.log(row, col)
+  const updateMatrix= ({row, col, symbol}: IMatrix) => {
+    const newMatrix = [...matrix];
+
+    if(newMatrix[row][col] === null || newMatrix[row][col] === "null"){
+      newMatrix[row][col] = symbol;
+      setMatrix(newMatrix);
+    }
   }
 
   return(
@@ -24,8 +31,8 @@ const Game = () => {
               <Cell 
                 key={colIdx} 
                 value={col}
-                colIdx={colIdx}
-                rowIdx={rowIdx} 
+                col={colIdx}
+                row={rowIdx} 
                 updateMatrix={updateMatrix}
               />
             ))}
