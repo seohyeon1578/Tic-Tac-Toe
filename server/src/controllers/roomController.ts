@@ -1,6 +1,11 @@
-import { Socket } from 'socket.io';
-import { Server } from 'socket.io';
-import { ConnectedSocket, MessageBody, OnMessage, SocketController, SocketIO } from "socket-controllers";
+import { Socket, Server } from 'socket.io';
+import { 
+  ConnectedSocket, 
+  MessageBody, 
+  OnMessage, 
+  SocketController, 
+  SocketIO 
+} from "socket-controllers";
 
 @SocketController()
 export class RoomController {
@@ -15,7 +20,7 @@ export class RoomController {
     console.log("joining room: ", message);
 
     const connectedSockets = io.sockets.adapter.rooms.get(message.roomId);
-    const socketRooms = Array.from(socket.rooms.values()).filter((r) => r !== socket.id);
+    const socketRooms = Array.from(socket.rooms.values()).filter((room) => room !== socket.id);
 
     if(socketRooms.length > 0 || connectedSockets && connectedSockets.size === 2){
       socket.emit("room_join_error", {
@@ -24,6 +29,11 @@ export class RoomController {
     }else {
       await socket.join(message.roomId);
       socket.emit("room_joined");
+
+      if(connectedSockets.size === 2){      
+        socket.emit("start_game", { start: false, symbol: "x" });
+        socket.to(message.roomId).emit("start_game", { start: true, symbol: "o"});
+      }
     }
   }
 }

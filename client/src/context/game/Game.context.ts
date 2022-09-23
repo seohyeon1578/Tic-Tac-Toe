@@ -6,6 +6,10 @@ const defaultState: IGameContextProps = {
   setInRoom: () => {},
   playerSymbol: 'x',
   setPlayerSymbol: () => {},
+  isPlayerTurn: false,
+  setPlayerTurn: () => {},
+  isGameStart: false,
+  setGameStart: () => {},
 };
 
 export default React.createContext(defaultState);

@@ -5,7 +5,8 @@ import GameContext from "../../context/game/Game.context";
 
 const Cell = ({value, col, row, updateMatrix}: ICellProps) => {
   const {playerSymbol, setPlayerSymbol}= useContext(GameContext);
-  const symbol = playerSymbol
+  const symbol = playerSymbol;
+
   return(
     <C.CellContainer onClick={() => updateMatrix({col, row, symbol})}>
       {value}

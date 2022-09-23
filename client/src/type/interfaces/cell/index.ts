@@ -1,3 +1,5 @@
+import { IPlayerSymbol } from './../../types/game.type';
+
 interface IColRow {
   col: number;
   row: number;
@@ -5,9 +7,9 @@ interface IColRow {
 
 export interface ICellProps extends IColRow{
   value: string | null;
-  updateMatrix: (iMatrix: IMatrix) => void;
+  updateMatrix: ({col, row, symbol}: IMatrix) => void;
 }
 
 export interface IMatrix extends IColRow{
-  symbol: 'x' | 'o';
+  symbol: IPlayerSymbol;
 }

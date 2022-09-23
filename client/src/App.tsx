@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { IGameContextProps } from './type/interfaces/game';
+import { IPlayerSymbol } from './type/types/game.type';
+import GameContext from './context/game/Game.context';
+import { socketService } from './utils/socket';
 import Game from './components/game';
 import JoinRoom from './components/joinRoom';
-import GameContext from './context/game/Game.context';
-import { IGameContextProps } from './type/interfaces/game';
-import { PlayerSymbol } from './type/types/game.type';
-import { socketService } from './utils/socket';
 
 function App(){
   const [isInRoom, setInRoom] = useState(false);
-  const [playerSymbol, setPlayerSymbol] = useState<PlayerSymbol>('x');
+  const [playerSymbol, setPlayerSymbol] = useState<IPlayerSymbol>('x');
+  const [isPlayerTurn, setPlayerTurn] = useState(false);
+  const [isGameStart, setGameStart] = useState(false);
 
   const connect = async() => {
     try { 
@@ -27,6 +29,10 @@ function App(){
     setInRoom,
     playerSymbol,
     setPlayerSymbol,
+    isPlayerTurn,
+    setPlayerTurn,
+    isGameStart,
+    setGameStart,
   }
 
   return (

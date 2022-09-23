@@ -1,11 +1,11 @@
 import React, { useState, useContext } from "react";
 import GameContext from "../../context/game/Game.context";
-import joinGameRoom from "../../utils/game";
+import { joinGameRoom } from "../../utils/game";
 import { socketService } from "../../utils/socket";
 
 const JoinRoom = () => {
   const [roomId, setRoomId] = useState("");
-  const [isJoining, setIsJoining] = useState(false);
+  const [isJoining, setJoining] = useState(false);
 
   const { isInRoom, setInRoom } = useContext(GameContext);
   
@@ -15,9 +15,9 @@ const JoinRoom = () => {
     e.preventDefault();
     
     const socket = socketService.getSocket();
-    if(!roomId || roomId.trim() === "") return;
+    if(!roomId || roomId.trim() === "" || !socket) return;
 
-    setIsJoining(true);
+    setJoining(true);
     
     let joined: boolean = false;
     try {
@@ -28,7 +28,7 @@ const JoinRoom = () => {
 
     if(joined) setInRoom(true);
 
-    setIsJoining(false);
+    setJoining(false);
   };
   
   return(
