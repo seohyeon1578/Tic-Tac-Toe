@@ -21,3 +21,11 @@ export const onGameUpdate = async(socket: Socket, listiner: (matrix: IPlayMatrix
 export const onStartGame = async(socket: Socket, listiner: (option: IStartGame) => void) => {
   socket.on("start_game", listiner);
 };
+
+export const gameWin = async(socket: Socket, message: string) => {
+  socket.emit("game_win", { message });
+};
+
+export const onGameWin = async(socket: Socket, listiner: (message: string) => void) => {
+  socket.on ("game_win", ({ message }) => listiner(message));
+};

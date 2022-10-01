@@ -17,7 +17,7 @@ export class RoomController {
     @MessageBody() message: any
   ) {
 
-    console.log("joining room: ", message);
+    console.log("joining room: ", message, "socket Id: ", socket.id);
 
     const connectedSockets = io.sockets.adapter.rooms.get(message.roomId);
     const socketRooms = Array.from(socket.rooms.values()).filter((room) => room !== socket.id);
