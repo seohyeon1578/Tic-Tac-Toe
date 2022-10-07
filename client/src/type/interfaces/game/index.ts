@@ -7,8 +7,8 @@ export interface IGameContextProps {
   setPlayerSymbol: (symbol: IPlayerSymbol) => void;
   isPlayerTurn: boolean;
   setPlayerTurn: (turn: boolean) => void;
-  isGameStart: boolean;
-  setGameStart: (start: boolean) => void;
+  isGameStarted: boolean;
+  setGameStarted: (start: boolean) => void;
 }
 
 export interface IStartGame {

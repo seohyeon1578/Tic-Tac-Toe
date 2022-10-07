@@ -1,40 +1,44 @@
-import React, { useState, useContext } from "react";
-import GameContext from "../../context/game/Game.context";
-import { joinGameRoom } from "../../utils/game";
-import { socketService } from "../../utils/socket";
+import React, { useContext, useState } from "react";
+import gameContext from "../../context/game/Game.context";
+import gameService from "../../services/gameService";
+import socketService from "../../services/socketService";
 
 const JoinRoom = () => {
-  const [roomId, setRoomId] = useState("");
+  const [roomName, setRoomName] = useState("");
   const [isJoining, setJoining] = useState(false);
 
-  const { isInRoom, setInRoom } = useContext(GameContext);
-  
-  const handleRoomIdChange = (e: React.ChangeEvent<HTMLInputElement>) => setRoomId(e.target.value); 
-  
-  const joinRoom = async(e: React.FormEvent) => {
+  const { isInRoom, setInRoom } = useContext(gameContext);
+
+  const handleRoomNameChange = (e: React.ChangeEvent<any>) => setRoomName(e.target.value);
+
+  const joinRoom = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const socket = socketService.getSocket();
-    if(!roomId || roomId.trim() === "" || !socket) return;
+
+    const socket = socketService.socket;
+    if (!roomName || roomName.trim() === "" || !socket) return;
 
     setJoining(true);
-    
-    let joined: boolean = false;
-    try {
-      joined = await joinGameRoom(socket, roomId)
-    }catch(err) {
-      alert(err);
-    }
 
-    if(joined) setInRoom(true);
+    const joined = await gameService
+      .joinGameRoom(socket, roomName)
+      .catch((err) => {
+        alert(err);
+      });
+
+    if (joined) setInRoom(true);
 
     setJoining(false);
   };
-  
-  return(
+
+  return (
     <form onSubmit={joinRoom}>
-      <input value={roomId} onChange={handleRoomIdChange}/>
-      <button type="submit" disabled={isJoining}>{isJoining ? "입장중...." : "입장"}</button>
+        <input
+          value={roomName}
+          onChange={handleRoomNameChange}
+        />
+        <button type="submit" disabled={isJoining}>
+          {isJoining ? "입장중..." : "입장"}
+        </button>
     </form>
   );
 };

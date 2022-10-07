@@ -4,12 +4,12 @@ import { IGameContextProps } from './../../type/interfaces/game';
 const defaultState: IGameContextProps = {
   isInRoom: false,
   setInRoom: () => {},
-  playerSymbol: 'x',
+  playerSymbol: "x",
   setPlayerSymbol: () => {},
   isPlayerTurn: false,
   setPlayerTurn: () => {},
-  isGameStart: false,
-  setGameStart: () => {},
+  isGameStarted: false,
+  setGameStarted: () => {},
 };
 
 export default React.createContext(defaultState);

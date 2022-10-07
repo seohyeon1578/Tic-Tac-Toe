@@ -1,9 +1,9 @@
-import React, { useState, useContext, useEffect, useCallback } from "react";
-import { IPlayMatrix } from "../../type/types/game.type";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import gameContext from "../../context/game/Game.context";
+import gameService from "../../services/gameService";
+import socketService from "../../services/socketService";
 import { IMatrix } from "../../type/interfaces/cell";
-import GameContext from "../../context/game/Game.context";
-import { socketService } from "../../utils/socket";
-import { gameWin, onGameUpdate, onGameWin, onStartGame, updateGame } from "../../utils/game";
+import { IPlayMatrix } from "../../type/types/game.type";
 import Cell from "../cell";
 import * as G from './Game.style';
 
@@ -14,18 +14,17 @@ const Game = () => {
     [null, null, null],
   ]);
 
-  const socket = socketService.getSocket();
+  const {
+    playerSymbol,
+    setPlayerSymbol,
+    setPlayerTurn,
+    isPlayerTurn,
+    setGameStarted,
+    isGameStarted,
+  } = useContext(gameContext);
 
-  const { 
-    playerSymbol, 
-    setPlayerSymbol, 
-    isPlayerTurn, 
-    setPlayerTurn, 
-    isGameStart, 
-    setGameStart 
-  } = useContext(GameContext);
-
-  const checkGameState = (matrix: IPlayMatrix) => {
+  /** 게임 상태 체크하는 함수 행 열 대각선을 체크한다*/
+  const checkGameState = useCallback((matrix: IPlayMatrix) => {
     // 행 체크
     for (let i = 0; i < matrix.length; i++) {
       let row = [];
@@ -34,28 +33,26 @@ const Game = () => {
       }
 
       if (row.every((value) => value && value === playerSymbol)) {
-        alert(playerSymbol + "Win");
         return [true, false];
-      }else if (row.every((value) => value && value !== playerSymbol)) {
-        alert(playerSymbol + "Win");
+      } else if (row.every((value) => value && value !== playerSymbol)) {
         return [false, true];
       }
     }
 
     // 열 체크
     for (let i = 0; i < matrix.length; i++) {
-      let col = [];
+      let column = [];
       for (let j = 0; j < matrix[i].length; j++) {
-        col.push(matrix[i][j]);
+        column.push(matrix[j][i]);
       }
 
-      if (col.every((value) => value && value === playerSymbol)) {
+      if (column.every((value) => value && value === playerSymbol)) {
         return [true, false];
-      }else if (col.every((value) => value && value !== playerSymbol)) {
+      } else if (column.every((value) => value && value !== playerSymbol)) {
         return [false, true];
       }
     }
-    
+
     // 대각선 체크
     if (matrix[1][1]) {
       if (matrix[0][0] === matrix[1][1] && matrix[2][2] === matrix[1][1]) {
@@ -73,77 +70,75 @@ const Game = () => {
     if (matrix.every((m) => m.every((v) => v !== null))) {
       return [true, true];
     }
-  
-    return [false, false];
-  };
 
-  const updateMatrix= ({row, col, symbol}: IMatrix) => {
+    return [false, false];
+  }, [playerSymbol]);
+
+  /** 게임Board의 상태를 변경해주는 함수 + 바뀔 때 마다 소켓통신과 게임 상태 체크*/
+  const updateMatrix = ({row, col, symbol}: IMatrix) => {
     const newMatrix = [...matrix];
 
-    if(newMatrix[row][col] === null || newMatrix[row][col] === "null"){
+    if (newMatrix[row][col] === null || newMatrix[row][col] === "null") {
       newMatrix[row][col] = symbol;
       setMatrix(newMatrix);
     }
 
-    if(socket){
-      updateGame(socket, newMatrix);
+    if (socketService.socket) {
+      gameService.updateGame(socketService.socket, newMatrix);
       const [currentPlayerWon, otherPlayerWon] = checkGameState(newMatrix);
       if (currentPlayerWon && otherPlayerWon) {
-        gameWin(socket, "The Game is a TIE!");
+        gameService.gameWin(socketService.socket, "The Game is a TIE!");
         alert("The Game is a TIE!");
       } else if (currentPlayerWon && !otherPlayerWon) {
-        gameWin(socket, "You Lost!");
+        gameService.gameWin(socketService.socket, "You Lost!");
         alert("You Won!");
       }
-      
+
       setPlayerTurn(false);
-    };
-  }
+    }
+  };
 
-  const handleStartGame = useCallback(() => {
-    if(socket){
-      onStartGame(socket, (options) => {
-        setGameStart(true);
-        setPlayerSymbol(options.symbol);
-        if(options.start){
-          setPlayerTurn(true);
-        }else {
-          setPlayerTurn(false);
-        }
-      });
-    }; 
-  }, [socket, setGameStart, setPlayerSymbol, setPlayerTurn]);
-
-  const handleGameUpdate = useCallback(() => { 
-    if(socket){
-      onGameUpdate(socket, (newMatrix) => {
+  /** 상대편, 소켓에서 넘어온 상태로 현재 상태를 변경하는 함수 */
+  const handleGameUpdate = useCallback(() => {
+    if (socketService.socket)
+      gameService.onGameUpdate(socketService.socket, (newMatrix) => {
         setMatrix(newMatrix);
         checkGameState(newMatrix);
         setPlayerTurn(true);
-      }) 
-    }  
-  }, [socket, setPlayerTurn]);
+      });
+  }, [checkGameState, setPlayerTurn]);
 
+  /** 상대편이 들어왔으면 게임을 시작시키는 함수 */
+  const handleStartGame = useCallback(() => {
+    if (socketService.socket)
+      gameService.onStartGame(socketService.socket, (options) => {
+        setGameStarted(true);
+        setPlayerSymbol(options.symbol);
+        if (options.start) setPlayerTurn(true);
+        else setPlayerTurn(false);
+      });
+  }, [setGameStarted, setPlayerSymbol, setPlayerTurn]);
+
+  /** 이긴사람 확인하는 함수 */
   const handleGameWin = useCallback(() => {
-    if (socket)
-      onGameWin(socket, (message) => {
+    if (socketService.socket)
+      gameService.onGameWin(socketService.socket, (message) => {
         console.log("Here", message);
         setPlayerTurn(false);
         alert(message);
       });
-  }, [socket, setPlayerTurn]);
+  }, [setPlayerTurn]);
 
   useEffect(() => {
     handleGameUpdate();
     handleStartGame();
     handleGameWin();
-  }, [handleGameUpdate, handleStartGame, handleGameWin])
-  
-  console.log(isGameStart, isPlayerTurn)
-  return(
+  }, [handleGameUpdate, handleStartGame, handleGameWin]);
+
+  return (
     <G.GameContainer>
-      {!isGameStart && (<h2>기다려!</h2>)}
-      {(!isGameStart || !isPlayerTurn) && <h2>상대턴</h2>}
+      {!isGameStarted && <h2>기다려!</h2>}
+      {(!isGameStarted || !isPlayerTurn) && <h2>상대턴</h2>}
       {matrix.map((row, rowIdx) => {
         return (
           <G.RowContainer key={rowIdx}>
@@ -157,9 +152,10 @@ const Game = () => {
               />
             ))}
           </G.RowContainer>
-        )})}
+        );
+      })}
     </G.GameContainer>
-  )
-};
+  );
+}
 
 export default Game;
