@@ -9,6 +9,31 @@ import {
 
 @SocketController()
 export class RoomController {
+
+  @OnMessage("get_room_list")
+  public async roomList(
+    @SocketIO() io: Server, 
+    @ConnectedSocket() socket: Socket, 
+    @MessageBody() message: any
+  ) {
+    const {
+      sockets: {
+        adapter: {
+          sids, rooms
+        }
+      }
+    } = io;
+    const roomList = [];
+
+    rooms.forEach((_, key) => {
+      if(sids.get(key) === undefined){
+        roomList.push({ "name": key, "size": rooms.get(key).size})
+      }
+    })
+
+    console.log(roomList)
+    socket.emit("room_list", { list: roomList})
+  }
   
   @OnMessage("join_game")
   public async joinGame(
@@ -16,7 +41,6 @@ export class RoomController {
     @ConnectedSocket() socket: Socket, 
     @MessageBody() message: any
   ) {
-
     console.log("joining room: ", message, "socket Id: ", socket.id);
 
     const connectedSockets = io.sockets.adapter.rooms.get(message.roomId);

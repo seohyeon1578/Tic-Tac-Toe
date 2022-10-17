@@ -1,8 +1,17 @@
+import { IList } from './../../type/interfaces/room/index';
 import { Socket } from "socket.io-client";
 import { IStartGame } from "../../type/interfaces/game";
 import { IPlayMatrix } from "../../type/types/game.type";
 
 class GameService {
+  public async getRoomList(
+    socket: Socket,
+    listiner: (list: IList) => void
+  ) {
+    socket.emit("get_room_list")
+    socket.on("room_list", ({ list } : { list: IList}) => listiner(list))
+  }
+
   public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
     return new Promise((rs, rj) => {
       socket.emit("join_game", { roomId });
