@@ -1,7 +1,9 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
 import gameContext from "../../context/game/Game.context";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
+import { gameState } from "../../store/game/gameState";
 import { IMatrix } from "../../type/interfaces/cell";
 import { IPlayMatrix } from "../../type/types/game.type";
 import Cell from "../cell";
@@ -13,6 +15,7 @@ const Game = () => {
     [null, null, null],
     [null, null, null],
   ]);
+  const [gamewin, setGameWin] = useRecoilState(gameState);
 
   const {
     playerSymbol,
@@ -87,11 +90,11 @@ const Game = () => {
       gameService.updateGame(socketService.socket, newMatrix);
       const [currentPlayerWon, otherPlayerWon] = checkGameState(newMatrix);
       if (currentPlayerWon && otherPlayerWon) {
-        gameService.gameWin(socketService.socket, "The Game is a TIE!");
-        alert("The Game is a TIE!");
+        gameService.gameWin(socketService.socket, "무승부");
+        alert("무승부");
       } else if (currentPlayerWon && !otherPlayerWon) {
-        gameService.gameWin(socketService.socket, "You Lost!");
-        alert("You Won!");
+        gameService.gameWin(socketService.socket, `${playerSymbol} 승리`);
+        alert(`${playerSymbol} 승리`)
       }
 
       setPlayerTurn(false);
@@ -123,7 +126,6 @@ const Game = () => {
   const handleGameWin = useCallback(() => {
     if (socketService.socket)
       gameService.onGameWin(socketService.socket, (message) => {
-        console.log("Here", message);
         setPlayerTurn(false);
         alert(message);
       });

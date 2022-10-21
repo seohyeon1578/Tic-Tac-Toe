@@ -13,8 +13,7 @@ export class RoomController {
   @OnMessage("get_room_list")
   public async roomList(
     @SocketIO() io: Server, 
-    @ConnectedSocket() socket: Socket, 
-    @MessageBody() message: any
+    @ConnectedSocket() socket: Socket
   ) {
     const {
       sockets: {
