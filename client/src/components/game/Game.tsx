@@ -8,6 +8,7 @@ import { IMatrix } from "../../type/interfaces/cell";
 import { IPlayMatrix } from "../../type/types/game.type";
 import Cell from "../cell";
 import * as G from './Game.style';
+import Score from "./score/Score";
 
 const Game = () => {
   const [matrix, setMatrix] = useState<IPlayMatrix>([
@@ -15,7 +16,7 @@ const Game = () => {
     [null, null, null],
     [null, null, null],
   ]);
-  const [gamewin, setGameWin] = useRecoilState(gameState);
+  const [gameWin, setGameWin] = useRecoilState(gameState);
 
   const {
     playerSymbol,
@@ -156,6 +157,7 @@ const Game = () => {
           </G.RowContainer>
         );
       })}
+      <Score />
     </G.GameContainer>
   );
 }

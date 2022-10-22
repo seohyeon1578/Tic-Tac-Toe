@@ -1,4 +1,3 @@
-import { listenerCount } from "process";
 import React, { useContext, useEffect, useState, useCallback } from "react";
 import gameContext from "../../context/game/Game.context";
 import gameService from "../../services/gameService";
@@ -28,7 +27,7 @@ const JoinRoom = () => {
       .getRoomList(socket, (list : IList) => {
         setRoomList(list)
       }).catch((err) => {
-        alert(err);
+        console.log(err);
       });
   }
 
@@ -52,7 +51,7 @@ const JoinRoom = () => {
     const joined = await gameService
       .joinGameRoom(socket, roomId)
       .catch((err) => {
-        alert(err);
+        console.log(err);
       });
 
     if (joined) setInRoom(true);
