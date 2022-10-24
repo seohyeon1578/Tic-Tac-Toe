@@ -5,7 +5,7 @@ import {
   OnMessage,
   SocketController
 } from "socket-controllers";
-import { Server, Socket } from "socket.io";
+import { Socket } from "socket.io";
 
 @SocketController()
 export class GameController {

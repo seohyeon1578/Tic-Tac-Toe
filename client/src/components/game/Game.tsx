@@ -91,11 +91,13 @@ const Game = () => {
       gameService.updateGame(socketService.socket, newMatrix);
       const [currentPlayerWon, otherPlayerWon] = checkGameState(newMatrix);
       if (currentPlayerWon && otherPlayerWon) {
-        gameService.gameWin(socketService.socket, "무승부");
+        gameService.gameWin(socketService.socket, "draw");
         alert("무승부");
+        setGameWin({...gameWin, draw: gameWin.draw + 1})
       } else if (currentPlayerWon && !otherPlayerWon) {
-        gameService.gameWin(socketService.socket, `${playerSymbol} 승리`);
+        gameService.gameWin(socketService.socket, playerSymbol);
         alert(`${playerSymbol} 승리`)
+        setGameWin({...gameWin, [playerSymbol] : gameWin[playerSymbol] + 1})
       }
 
       setPlayerTurn(false);
@@ -128,14 +130,21 @@ const Game = () => {
     if (socketService.socket)
       gameService.onGameWin(socketService.socket, (message) => {
         setPlayerTurn(false);
-        alert(message);
+        if(message === "draw"){
+          alert("무승부");
+          setGameWin({...gameWin, draw: gameWin.draw + 1})
+        }else {
+          alert(`${message} 승리`)
+          const winSymbol = message === 'x' ? 'x': 'o';
+          setGameWin({...gameWin, [message] : gameWin[winSymbol] + 1})
+        }
       });
-  }, [setPlayerTurn]);
+  }, [gameWin, setGameWin, setPlayerTurn]);
 
   useEffect(() => {
     handleGameUpdate();
     handleStartGame();
-    handleGameWin();
+    handleGameWin();  
   }, [handleGameUpdate, handleStartGame, handleGameWin]);
 
   return (
