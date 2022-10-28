@@ -1,7 +1,8 @@
-import React, { useContext, useEffect, useState, useCallback } from "react";
-import gameContext from "../../context/game/Game.context";
+import React, { useEffect, useState, useCallback } from "react";
+import { useRecoilState } from "recoil";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
+import { inRoom } from "../../store/game/inRoom";
 import { IList } from "../../type/interfaces/room";
 
 const JoinRoom = () => {
@@ -9,7 +10,7 @@ const JoinRoom = () => {
   const [roomList, setRoomList] = useState<IList>([]);
   const [isJoining, setJoining] = useState(false);
   
-  const { setInRoom } = useContext(gameContext);
+  const [isInRoom, setInRoom] = useRecoilState(inRoom);
 
   const connect = useCallback(async() => {
     const socket = await socketService

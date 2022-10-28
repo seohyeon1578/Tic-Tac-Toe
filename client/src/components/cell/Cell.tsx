@@ -1,14 +1,14 @@
 import React, { useContext } from "react";
+import { useRecoilState } from "recoil";
+import { symbolState } from "../../store/game/symbolState";
 import { ICellProps } from "../../type/interfaces/cell";
 import * as C from "./Cell.style";
-import GameContext from "../../context/game/Game.context";
 
 const Cell = ({value, col, row, updateMatrix}: ICellProps) => {
-  const { playerSymbol }= useContext(GameContext);
-  const symbol = playerSymbol;
+  const [playerSymbol, setPlayerSymbol] = useRecoilState(symbolState)
 
   return(
-    <C.CellContainer onClick={() => updateMatrix({col, row, symbol})}>
+    <C.CellContainer onClick={() => updateMatrix({col, row, symbol: playerSymbol})}>
       {value}
     </C.CellContainer>
   );

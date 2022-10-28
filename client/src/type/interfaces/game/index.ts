@@ -1,14 +1,10 @@
 import { IPlayerSymbol } from './../../types/game.type';
 
-export interface IGameContextProps {
-  isInRoom: boolean;
-  setInRoom: (inRoom: boolean) => void;
-  playerSymbol: IPlayerSymbol;
-  setPlayerSymbol: (symbol: IPlayerSymbol) => void;
-  isPlayerTurn: boolean;
-  setPlayerTurn: (turn: boolean) => void;
-  isGameStarted: boolean;
-  setGameStarted: (start: boolean) => void;
+export interface IGameState {
+  x: number,
+  o: number,
+  draw: number,
+  [key: string]: number
 }
 
 export interface IStartGame {

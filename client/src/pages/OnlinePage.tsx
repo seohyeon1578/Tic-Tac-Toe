@@ -1,10 +1,11 @@
-import React, { useContext } from "react";
-import GameContext from "../context/game/Game.context";
+import React from "react";
+import { useRecoilState } from "recoil";
 import Game from "../components/game";
 import JoinRoom from "../components/joinRoom";
+import { inRoom } from "../store/game/inRoom";
 
 const OnlinePage = () => {
-  const { isInRoom } = useContext(GameContext);
+  const [isInRoom, setInRoom] = useRecoilState(inRoom);
   
   return (
     <div>
@@ -14,4 +15,4 @@ const OnlinePage = () => {
  );
 };
 
-export default OnlinePage
+export default OnlinePage;

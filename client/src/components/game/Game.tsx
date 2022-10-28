@@ -1,31 +1,31 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
-import gameContext from "../../context/game/Game.context";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
 import { gameState } from "../../store/game/gameState";
+import { symbolState } from "../../store/game/symbolState";
+import { turnState } from "../../store/game/turnState";
+import { gameStarted } from "../../store/game/gameStarted";
 import { IMatrix } from "../../type/interfaces/cell";
 import { IPlayMatrix } from "../../type/types/game.type";
 import Cell from "../cell";
-import * as G from './Game.style';
 import Score from "./score/Score";
+import * as G from './Game.style';
 
 const Game = () => {
-  const [matrix, setMatrix] = useState<IPlayMatrix>([
-    [null, null, null],
-    [null, null, null],
-    [null, null, null],
-  ]);
+  const [matrix, setMatrix] = useState<IPlayMatrix>(Array(9).fill(""));
+  const [nodes, setNodes] = useState({});
+  const [winLine, setWinLine] = useState([]);
+  
   const [gameWin, setGameWin] = useRecoilState(gameState);
-
-  const {
-    playerSymbol,
-    setPlayerSymbol,
-    setPlayerTurn,
-    isPlayerTurn,
-    setGameStarted,
-    isGameStarted,
-  } = useContext(gameContext);
+  const [playerSymbol, setPlayerSymbol] = useRecoilState(symbolState);
+  const [isPlayerTurn, setPlayerTurn] = useRecoilState(turnState)
+  const [isGameStarted, setGameStarted] = useRecoilState(gameStarted)
+  
+  const gameReset = () => {
+    setWinLine([])
+    setMatrix(Array(9).fill(""));
+  }
 
   /** 게임 상태 체크하는 함수 행 열 대각선을 체크한다*/
   const checkGameState = useCallback((matrix: IPlayMatrix) => {
@@ -135,8 +135,7 @@ const Game = () => {
           setGameWin({...gameWin, draw: gameWin.draw + 1})
         }else {
           alert(`${message} 승리`)
-          const winSymbol = message === 'x' ? 'x': 'o';
-          setGameWin({...gameWin, [message] : gameWin[winSymbol] + 1})
+          setGameWin({...gameWin, [message] : gameWin[message] + 1})
         }
       });
   }, [gameWin, setGameWin, setPlayerTurn]);
@@ -146,7 +145,7 @@ const Game = () => {
     handleStartGame();
     handleGameWin();  
   }, [handleGameUpdate, handleStartGame, handleGameWin]);
-
+  
   return (
     <G.GameContainer>
       {!isGameStarted && <h2>기다려!</h2>}
