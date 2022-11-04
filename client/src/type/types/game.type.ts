@@ -1,3 +1,3 @@
-export type IPlayMatrix = Array<Array<string>>;
+export type IPlayMatrix = Array<string>;
 
-export type IPlayerSymbol = "x" | "o";
+export type IPlayerSymbol = "X" | "O";

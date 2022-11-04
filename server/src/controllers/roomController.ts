@@ -54,8 +54,8 @@ export class RoomController {
       socket.emit("room_joined");
 
       if(connectedSockets.size === 2){      
-        socket.emit("start_game", { start: false, symbol: "x" });
-        socket.to(message.roomId).emit("start_game", { start: true, symbol: "o"});
+        socket.emit("start_game", { start: false, symbol: "X" });
+        socket.to(message.roomId).emit("start_game", { start: true, symbol: "O"});
       }
     }
   }

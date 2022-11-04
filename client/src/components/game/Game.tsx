@@ -12,9 +12,15 @@ import Cell from "../cell";
 import Score from "./score/Score";
 import * as G from './Game.style';
 
+interface IWinner {
+  winLine?: any;
+  winner?: string;
+  notWin?: boolean; 
+}
+
 const Game = () => {
   const [matrix, setMatrix] = useState<IPlayMatrix>(Array(9).fill(""));
-  const [nodes, setNodes] = useState({});
+  const [nodes, setNodes] = useState<{[key: number]: any}>({});
   const [winLine, setWinLine] = useState([]);
   
   const [gameWin, setGameWin] = useRecoilState(gameState);
@@ -27,80 +33,180 @@ const Game = () => {
     setMatrix(Array(9).fill(""));
   }
 
-  /** 게임 상태 체크하는 함수 행 열 대각선을 체크한다*/
-  const checkGameState = useCallback((matrix: IPlayMatrix) => {
-    // 행 체크
-    for (let i = 0; i < matrix.length; i++) {
-      let row = [];
-      for (let j = 0; j < matrix[i].length; j++) {
-        row.push(matrix[i][j]);
-      }
+  const getAvailableMoves = (board: string[]) => {
+    const moves: number[] = [];
+    board.forEach((cell, index) => {
+      if (!cell) moves.push(index);
+    });
+    return moves;
+  };
 
-      if (row.every((value) => value && value === playerSymbol)) {
-        return [true, false];
-      } else if (row.every((value) => value && value !== playerSymbol)) {
-        return [false, true];
-      }
+  const handleClick = (id: number) => {
+    if (
+      isTerminal(matrix).winner === "X" ||
+      isTerminal(matrix).winner === "O" ||
+      isFull(matrix)
+    ) {
+      gameReset();
+      return;
     }
 
-    // 열 체크
-    for (let i = 0; i < matrix.length; i++) {
-      let column = [];
-      for (let j = 0; j < matrix[i].length; j++) {
-        column.push(matrix[j][i]);
-      }
-
-      if (column.every((value) => value && value === playerSymbol)) {
-        return [true, false];
-      } else if (column.every((value) => value && value !== playerSymbol)) {
-        return [false, true];
-      }
-    }
-
-    // 대각선 체크
-    if (matrix[1][1]) {
-      if (matrix[0][0] === matrix[1][1] && matrix[2][2] === matrix[1][1]) {
-        if (matrix[1][1] === playerSymbol) return [true, false];
-        else return [false, true];
-      }
-
-      if (matrix[2][0] === matrix[1][1] && matrix[0][2] === matrix[1][1]) {
-        if (matrix[1][1] === playerSymbol) return [true, false];
-        else return [false, true];
-      }
-    }
-
-    // 무승부
-    if (matrix.every((m) => m.every((v) => v !== null))) {
-      return [true, true];
-    }
-
-    return [false, false];
-  }, [playerSymbol]);
-
-  /** 게임Board의 상태를 변경해주는 함수 + 바뀔 때 마다 소켓통신과 게임 상태 체크*/
-  const updateMatrix = ({row, col, symbol}: IMatrix) => {
-    const newMatrix = [...matrix];
-
-    if (newMatrix[row][col] === null || newMatrix[row][col] === "null") {
-      newMatrix[row][col] = symbol;
-      setMatrix(newMatrix);
-    }
+    if (matrix[id] !== "") return;
 
     if (socketService.socket) {
-      gameService.updateGame(socketService.socket, newMatrix);
-      const [currentPlayerWon, otherPlayerWon] = checkGameState(newMatrix);
-      if (currentPlayerWon && otherPlayerWon) {
-        gameService.gameWin(socketService.socket, "draw");
-        alert("무승부");
-        setGameWin({...gameWin, draw: gameWin.draw + 1})
-      } else if (currentPlayerWon && !otherPlayerWon) {
-        gameService.gameWin(socketService.socket, playerSymbol);
-        alert(`${playerSymbol} 승리`)
-        setGameWin({...gameWin, [playerSymbol] : gameWin[playerSymbol] + 1})
-      }
+      let editedBoard = [...matrix];
+      console.log(playerSymbol)
+      editedBoard[id] = playerSymbol;
 
+      setMatrix(editedBoard);
+      gameService.updateGame(socketService.socket, editedBoard);
+      if (isTerminal(editedBoard).winner === playerSymbol) {
+        const symbol = playerSymbol.toLowerCase()
+        gameService.gameWin(socketService.socket, symbol);
+        setWinLine(isTerminal(editedBoard).winLine);
+        setGameWin((prev) => ({...prev, [symbol]: prev[symbol] + 1}))
+        return;
+      }
+      if (isTerminal(editedBoard).winner === "draw") {
+        gameService.gameWin(socketService.socket, "draw");
+        setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
+      }
       setPlayerTurn(false);
+    } else {
+      let editedBoard = [...matrix];
+      editedBoard[id] = "X";
+
+      setMatrix(editedBoard);
+      if (isTerminal(editedBoard).winner === "X") {
+        setWinLine(isTerminal(editedBoard).winLine);
+        setGameWin((prev) => ({...prev, x: prev.x + 1}))
+        return;
+      }
+  
+      let randomNumber = getBestMove(editedBoard, 0, false);
+      if (editedBoard[randomNumber] === "") {
+        editedBoard[randomNumber] = "O";
+      }
+      
+      setMatrix(editedBoard);
+  
+  
+      if (isTerminal(editedBoard).winner === "O") {
+        setWinLine(isTerminal(editedBoard).winLine);
+        setGameWin((prev) => ({...prev, o: prev.o + 1}))
+        return;
+      }
+  
+      if (isTerminal(editedBoard).winner === "draw") {
+        setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
+      }
+    }
+  };
+
+  const isEmpty = (board: string[]) => {
+    return board.every((cell) => !cell);
+  };
+
+  const isFull = (board: string[]) => {
+    return board.every((cell) => cell);
+  };
+
+  const isTerminal = useCallback((board: string[]): IWinner => {
+    if (isEmpty(board)) return { notWin: false};
+
+    if (board[0] === board[1] && board[0] === board[2] && board[0]) {
+      return { winner: board[0], winLine: [0, 1, 2] };
+    }
+    if (board[3] === board[4] && board[3] === board[5] && board[3]) {
+      return { winner: board[3], winLine: [3, 4, 5] };
+    }
+    if (board[6] === board[7] && board[6] === board[8] && board[6]) {
+      return { winner: board[6], winLine: [6, 7, 8] };
+    }
+
+    if (board[0] === board[3] && board[0] === board[6] && board[0]) {
+      return { winner: board[0], winLine: [0, 3, 6] };
+    }
+    if (board[1] === board[4] && board[1] === board[7] && board[1]) {
+      return { winner: board[1], winLine: [1, 4, 7] };
+    }
+    if (board[2] === board[5] && board[2] === board[8] && board[2]) {
+      return { winner: board[2], winLine: [2, 5, 8] };
+    }
+
+    if (board[0] === board[4] && board[0] === board[8] && board[0]) {
+      return { winner: board[0], winLine: [0, 4, 8] };
+    }
+    if (board[2] === board[4] && board[2] === board[6] && board[2]) {
+      return { winner: board[2], winLine: [2, 4, 6] };
+    }
+
+    if (isFull(board)) {
+      return { winner: "draw" };
+    }
+
+    return { notWin :false };
+  }, []);
+
+  const getBestMove = (newBoard: string[], depth: number, isMax: boolean, callback?: (returnValue?: any) => void) => {
+    if (depth === 0) setNodes({});
+
+    if (isTerminal(newBoard).notWin || isTerminal(newBoard).winner || depth === -1) {
+      if (isTerminal(newBoard).winner === "X") {
+        return 100 - depth;
+      } else if (isTerminal(newBoard).winner === "O") {
+        return -100 + depth;
+      }
+      return 0;
+    }
+
+    if (isMax) {
+      let best = -100;
+
+      getAvailableMoves(newBoard).forEach((index) => {
+        let child = [...newBoard];
+        child[index] = "X";
+
+        let score = getBestMove(child, depth + 1, false, callback);
+        best = Math.max(best, score);
+      });
+
+      return best;
+    }
+
+    if (!isMax) {
+      let best = 100;
+
+      getAvailableMoves(newBoard).forEach((index) => {
+        let child = [...newBoard];
+        child[index] = "O";
+
+        let score = getBestMove(child, depth + 1, true, callback);
+        best = Math.min(best, score);
+
+        if (depth === 0) {
+          console.log(nodes);
+          const moves = nodes[score] ? `${nodes[score]},${index}` : index;
+          nodes[score] = moves;
+        }
+      });
+      if (depth === 0) {
+        let returnValue;
+
+        if (typeof nodes[best] === "string") {
+          const arr = nodes[best].split(",");
+          const rand = Math.floor(Math.random() * arr.length);
+          returnValue = arr[rand];
+        } else {
+          returnValue = nodes[best];
+        }
+
+        if(callback){
+          callback(returnValue);
+        }
+        return returnValue;
+      }
+      return best;
     }
   };
 
@@ -109,10 +215,9 @@ const Game = () => {
     if (socketService.socket)
       gameService.onGameUpdate(socketService.socket, (newMatrix) => {
         setMatrix(newMatrix);
-        checkGameState(newMatrix);
         setPlayerTurn(true);
       });
-  }, [checkGameState, setPlayerTurn]);
+  }, [setPlayerTurn]);
 
   /** 상대편이 들어왔으면 게임을 시작시키는 함수 */
   const handleStartGame = useCallback(() => {
@@ -131,14 +236,13 @@ const Game = () => {
       gameService.onGameWin(socketService.socket, (message) => {
         setPlayerTurn(false);
         if(message === "draw"){
-          alert("무승부");
-          setGameWin({...gameWin, draw: gameWin.draw + 1})
+          setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
         }else {
-          alert(`${message} 승리`)
-          setGameWin({...gameWin, [message] : gameWin[message] + 1})
+          console.log(message)
+          setGameWin((prev) => ({...prev, [message]: prev[message] + 1}))
         }
       });
-  }, [gameWin, setGameWin, setPlayerTurn]);
+  }, [setGameWin, setPlayerTurn]);
 
   useEffect(() => {
     handleGameUpdate();
@@ -148,23 +252,16 @@ const Game = () => {
   
   return (
     <G.GameContainer>
-      {!isGameStarted && <h2>기다려!</h2>}
-      {(!isGameStarted || !isPlayerTurn) && <h2>상대턴</h2>}
-      {matrix.map((row, rowIdx) => {
-        return (
-          <G.RowContainer key={rowIdx}>
-            {row.map((col, colIdx) => (
-              <Cell 
-                key={colIdx} 
-                value={col}
-                col={colIdx}
-                row={rowIdx} 
-                updateMatrix={updateMatrix}
-              />
-            ))}
-          </G.RowContainer>
-        );
-      })}
+      {/* {!isGameStarted && <h2>기다려!</h2>}
+      {(!isGameStarted || !isPlayerTurn) && <h2>상대턴</h2>} */}
+      {matrix.map((val, idx) => (
+        <Cell 
+          key={idx}
+          id={idx}
+          value={val}
+          handleClick={handleClick}
+        />
+      ))}
       <Score />
     </G.GameContainer>
   );
