@@ -34,4 +34,13 @@ export const CellContainer = styled.div`
   :nth-child(9) {
     border-width: 1px 0 0 1px;
   }
+
+  @keyframes blinker {
+    30% {
+      opacity: 0;
+    }
+  }
+  .change {
+    animation: blinker 1s linear infinite;
+  }
 `;

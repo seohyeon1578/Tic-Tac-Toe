@@ -6,7 +6,6 @@ import { gameState } from "../../store/game/gameState";
 import { symbolState } from "../../store/game/symbolState";
 import { turnState } from "../../store/game/turnState";
 import { gameStarted } from "../../store/game/gameStarted";
-import { IMatrix } from "../../type/interfaces/cell";
 import { IPlayMatrix } from "../../type/types/game.type";
 import Cell from "../cell";
 import Score from "./score/Score";
@@ -185,7 +184,6 @@ const Game = () => {
         best = Math.min(best, score);
 
         if (depth === 0) {
-          console.log(nodes);
           const moves = nodes[score] ? `${nodes[score]},${index}` : index;
           nodes[score] = moves;
         }
@@ -238,11 +236,11 @@ const Game = () => {
         if(message === "draw"){
           setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
         }else {
-          console.log(message)
+          setWinLine(isTerminal(matrix).winLine);
           setGameWin((prev) => ({...prev, [message]: prev[message] + 1}))
         }
       });
-  }, [setGameWin, setPlayerTurn]);
+  }, [isTerminal, matrix, setGameWin, setPlayerTurn]);
 
   useEffect(() => {
     handleGameUpdate();
@@ -259,6 +257,7 @@ const Game = () => {
           key={idx}
           id={idx}
           value={val}
+          winLine={winLine}
           handleClick={handleClick}
         />
       ))}

@@ -9,7 +9,6 @@ const OnlinePage = () => {
   
   return (
     <div>
-        <h2>test1</h2>
         {!isInRoom ? <JoinRoom /> : <Game />}
     </div>
  );
