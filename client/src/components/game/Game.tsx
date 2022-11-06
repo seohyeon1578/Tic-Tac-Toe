@@ -252,15 +252,17 @@ const Game = () => {
     <G.GameContainer>
       {/* {!isGameStarted && <h2>기다려!</h2>}
       {(!isGameStarted || !isPlayerTurn) && <h2>상대턴</h2>} */}
-      {matrix.map((val, idx) => (
-        <Cell 
-          key={idx}
-          id={idx}
-          value={val}
-          winLine={winLine}
-          handleClick={handleClick}
-        />
-      ))}
+      <G.Board>
+        {matrix.map((val, idx) => (
+          <Cell 
+            key={idx}
+            id={idx}
+            value={val}
+            winLine={winLine}
+            handleClick={handleClick}
+          />
+        ))}
+      </G.Board>
       <Score />
     </G.GameContainer>
   );

@@ -5,19 +5,20 @@ import * as S from "./Score.style";
 
 const Score = () => {
   const [gameWin, setGameWin] = useRecoilState(gameState);
+
   return (
     <S.Container>
         <S.ItemWrap>
-          <span>X</span>
-          <span>{gameWin.x}</span>
+          <S.Player>X</S.Player>
+          <S.Value>{gameWin.x}</S.Value>
         </S.ItemWrap>
         <S.ItemWrap>
-          <span>DRAW</span>
-          <span>{gameWin.draw}</span>
+          <S.Player>DRAW</S.Player>
+          <S.Value>{gameWin.draw}</S.Value>
         </S.ItemWrap>
         <S.ItemWrap>
-          <span>O</span>
-          <span>{gameWin.o}</span>
+          <S.Player>O</S.Player>
+          <S.Value>{gameWin.o}</S.Value>
         </S.ItemWrap>
     </S.Container>
   )

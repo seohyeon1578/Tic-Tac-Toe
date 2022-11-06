@@ -1,9 +1,9 @@
 import styled from "styled-components";
 
 export const CellContainer = styled.div`
-  width: 150px;
-  height: 150px;
-  border: 1px solid black;
+  width: 200px;
+  height: 200px;
+  border: 1px solid white;
   
   :nth-child(1) {
     border-width: 0 1px 1px 0;

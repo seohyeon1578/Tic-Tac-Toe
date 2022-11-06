@@ -8,7 +8,7 @@ export const Container = styled.section`
   justify-content: center;
   align-items: center;
 
-  background-color: #312E2B;
+  background-color: ${({ theme }) => theme.mainBgColor};
 `;
 
 export const ButtonWrap = styled.div`
