@@ -3,12 +3,14 @@ import ReactDOM from 'react-dom';
 import { RecoilRoot } from 'recoil';
 import App from './App';
 import GlobalStyle from './assets/styles/globals.style';
+import GlobalFont from './assets/styles/fonts'; 
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
       <GlobalStyle />
+      <GlobalFont />
       <App />
     </RecoilRoot>
   </React.StrictMode>,
