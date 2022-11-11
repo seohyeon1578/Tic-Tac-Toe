@@ -1,21 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useResetRecoilState } from "recoil";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
 import { gameState } from "../../store/game/gameState";
 import { symbolState } from "../../store/game/symbolState";
 import { turnState } from "../../store/game/turnState";
 import { gameStarted } from "../../store/game/gameStarted";
-import { IPlayMatrix } from "../../type/types/game.type";
+import { IBoard, IPlayMatrix } from "../../type/types/game.type";
 import Cell from "../cell";
 import Score from "./score/Score";
 import * as G from './Game.style';
-
-interface IWinner {
-  winLine?: any;
-  winner?: string;
-  notWin?: boolean; 
-}
+import { IWinner } from "../../type/interfaces/game";
 
 const Game = () => {
   const [matrix, setMatrix] = useState<IPlayMatrix>(Array(9).fill(""));
@@ -26,13 +21,14 @@ const Game = () => {
   const [playerSymbol, setPlayerSymbol] = useRecoilState(symbolState);
   const [isPlayerTurn, setPlayerTurn] = useRecoilState(turnState)
   const [isGameStarted, setGameStarted] = useRecoilState(gameStarted)
-  
+  const resetGameState = useResetRecoilState(gameState);
+
   const gameReset = () => {
     setWinLine([])
     setMatrix(Array(9).fill(""));
   }
 
-  const getAvailableMoves = (board: string[]) => {
+  const getAvailableMoves = (board: IBoard) => {
     const moves: number[] = [];
     board.forEach((cell, index) => {
       if (!cell) moves.push(index);
@@ -102,15 +98,15 @@ const Game = () => {
     }
   };
 
-  const isEmpty = (board: string[]) => {
+  const isEmpty = (board: IBoard) => {
     return board.every((cell) => !cell);
   };
 
-  const isFull = (board: string[]) => {
+  const isFull = (board: IBoard) => {
     return board.every((cell) => cell);
   };
 
-  const isTerminal = useCallback((board: string[]): IWinner => {
+  const isTerminal = useCallback((board: IBoard): IWinner => {
     if (isEmpty(board)) return { notWin: false};
 
     if (board[0] === board[1] && board[0] === board[2] && board[0]) {
@@ -248,10 +244,14 @@ const Game = () => {
     handleGameWin();  
   }, [handleGameUpdate, handleStartGame, handleGameWin]);
   
+  useEffect(() => {
+    resetGameState();
+  }, [resetGameState]);
+
   return (
     <G.GameContainer>
-      {/* {!isGameStarted && <h2>기다려!</h2>}
-      {(!isGameStarted || !isPlayerTurn) && <h2>상대턴</h2>} */}
+      {socketService.socket && !isGameStarted && <h2>기다려!</h2>}
+      {(!isGameStarted || !isPlayerTurn) && <h2>상대턴</h2>}
       <G.Board>
         {matrix.map((val, idx) => (
           <Cell 

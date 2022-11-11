@@ -7,6 +7,12 @@ export interface IGameState {
   [key: string]: number
 }
 
+export interface IWinner {
+  winLine?: any;
+  winner?: string;
+  notWin?: boolean; 
+}
+
 export interface IStartGame {
   start: boolean;
   symbol: IPlayerSymbol;

@@ -1,12 +1,13 @@
 import React from "react";
 import Game from "../components/game";
+import Gameframe from "../components/gameframe";
 
-const OnlinePage = () => {
+const ComputerPage = () => {
   return (
-    <div>
+    <Gameframe>
         <Game />
-    </div>
+    </Gameframe>
  );
 };
 
-export default OnlinePage;
+export default ComputerPage;
