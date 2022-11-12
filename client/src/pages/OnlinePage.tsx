@@ -7,10 +7,21 @@ import { inRoom } from "../store/game/inRoom";
 import JoinRoomFrame from "../assets/images/selectframe.png";
 import gameFrame from "../assets/images/gameframe.png";
 import * as O from "../assets/styles/Main.style";
+import gameService from "../services/gameService";
+import socketService from "../services/socketService";
+import { roomId } from "../store/game/roomId";
 
 const OnlinePage = () => {
   const [isInRoom, setInRoom] = useRecoilState(inRoom);
+  const [roomIdValue, setRoomId] = useRecoilState(roomId);
   
+  const handlerClick = () =>{
+    if(socketService.socket && isInRoom){
+      gameService.leaveGameRoom(socketService.socket, roomIdValue);
+      setInRoom(false);
+    }
+  };
+
   return (
     <Gameframe src={!isInRoom ? JoinRoomFrame : gameFrame}>
       {!isInRoom 
@@ -23,7 +34,7 @@ const OnlinePage = () => {
       </>
       : 
         <Game />}
-      <O.ButtonWrap width="20" to="/select">
+      <O.ButtonWrap width="20" to={!isInRoom ? "/select" : "/online"} onClick={handlerClick}>
         <O.TopBtn 
           width="20" 
           firstColor="#4C87FF" 

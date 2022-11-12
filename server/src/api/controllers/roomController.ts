@@ -59,4 +59,15 @@ export class RoomController {
       }
     }
   }
-}
+
+  @OnMessage("leave_game")
+  public async leaveGame(
+    @SocketIO() io: Server, 
+    @ConnectedSocket() socket: Socket, 
+    @MessageBody() message: any
+  ) {
+    console.log("leave room: ", message, "socket Id: ", socket.id);
+    socket.leave(message.roomId)
+    socket.to(message.roomId).emit("end_game");
+  }
+} 

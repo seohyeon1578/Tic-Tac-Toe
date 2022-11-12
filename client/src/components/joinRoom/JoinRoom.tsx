@@ -3,6 +3,7 @@ import { useRecoilState } from "recoil";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
 import { inRoom } from "../../store/game/inRoom";
+import { roomId } from "../../store/game/roomId";
 import { IList } from "../../type/interfaces/room";
 import * as J from "./JoinRoom.style";
 
@@ -12,6 +13,7 @@ const JoinRoom = () => {
   const [isJoining, setJoining] = useState(false);
   
   const [isInRoom, setInRoom] = useRecoilState(inRoom);
+  const [roomIdValue, setRoomId] = useRecoilState(roomId);
 
   const connect = useCallback(async() => {
     const socket = await socketService
@@ -41,8 +43,10 @@ const JoinRoom = () => {
     let roomId = ""
     if(e.type === "submit"){
       roomId = roomName
+      setRoomId(roomName)
     }else if (e.type === "click"){
       roomId = (e.target as HTMLButtonElement).value
+      setRoomId((e.target as HTMLButtonElement).value)
     }
 
     const socket = socketService.socket;

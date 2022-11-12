@@ -20,6 +20,10 @@ class GameService {
     });
   }
 
+  public async leaveGameRoom(socket: Socket, roomId: string) {
+    socket.emit("leave_game", { roomId });
+  }
+
   public async updateGame(socket: Socket, gameMatrix: IPlayMatrix) {
     socket.emit("update_game", { matrix: gameMatrix });
   }
@@ -36,6 +40,13 @@ class GameService {
     listiner: (options: IStartGame) => void
   ) {
     socket.on("start_game", listiner);
+  }
+
+  public async onEndGame(
+    socket: Socket,
+    listiner: () => void
+  ){
+    socket.on("end_game", listiner);
   }
 
   public async gameWin(socket: Socket, message: string) {

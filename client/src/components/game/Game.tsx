@@ -212,27 +212,29 @@ const Game = () => {
 
   /** 상대편, 소켓에서 넘어온 상태로 현재 상태를 변경하는 함수 */
   const handleGameUpdate = useCallback(() => {
-    if (socketService.socket)
+    if (socketService.socket){
       gameService.onGameUpdate(socketService.socket, (newMatrix) => {
         setMatrix(newMatrix);
         setPlayerTurn(true);
       });
+    }
   }, [setPlayerTurn]);
 
   /** 상대편이 들어왔으면 게임을 시작시키는 함수 */
   const handleStartGame = useCallback(() => {
-    if (socketService.socket)
+    if (socketService.socket){
       gameService.onStartGame(socketService.socket, (options) => {
         setGameStarted(true);
         setPlayerSymbol(options.symbol);
         if (options.start) setPlayerTurn(true);
         else setPlayerTurn(false);
       });
+    }
   }, [setGameStarted, setPlayerSymbol, setPlayerTurn]);
 
   /** 이긴사람 확인하는 함수 */
   const handleGameWin = useCallback(() => {
-    if (socketService.socket)
+    if (socketService.socket){
       gameService.onGameWin(socketService.socket, (message) => {
         setPlayerTurn(false);
         if(message === "draw"){
@@ -242,13 +244,26 @@ const Game = () => {
           setGameWin((prev) => ({...prev, [message]: prev[message] + 1}))
         }
       });
+    }
   }, [isTerminal, matrix, setGameWin, setPlayerTurn]);
+
+  const handleEndGame = useCallback(() => {
+    if(socketService.socket){
+      gameService.onEndGame(socketService.socket, () => {
+        setGameStarted(false);
+        setPlayerTurn(false);
+        gameReset();
+        resetGameState();
+      });
+    }
+  }, [resetGameState, setGameStarted, setPlayerTurn])
 
   useEffect(() => {
     handleGameUpdate();
     handleStartGame();
     handleGameWin();  
-  }, [handleGameUpdate, handleStartGame, handleGameWin]);
+    handleEndGame();
+  }, [handleGameUpdate, handleStartGame, handleGameWin, handleEndGame]);
   
   useEffect(() => {
     resetGameState();
