@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useRecoilState, useResetRecoilState } from "recoil";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
@@ -7,10 +8,11 @@ import { symbolState } from "../../store/game/symbolState";
 import { turnState } from "../../store/game/turnState";
 import { gameStarted } from "../../store/game/gameStarted";
 import { IBoard, IPlayMatrix } from "../../type/types/game.type";
+import { IWinner } from "../../type/interfaces/game";
 import Cell from "../cell";
 import Score from "./score/Score";
+import Board from "../../assets/images/board.png";
 import * as G from './Game.style';
-import { IWinner } from "../../type/interfaces/game";
 
 const Game = () => {
   const [matrix, setMatrix] = useState<IPlayMatrix>(Array(9).fill(""));
@@ -23,6 +25,8 @@ const Game = () => {
   const [isGameStarted, setGameStarted] = useRecoilState(gameStarted)
   const resetGameState = useResetRecoilState(gameState);
 
+  const location = useLocation();
+  
   const gameReset = () => {
     setWinLine([])
     setMatrix(Array(9).fill(""));
@@ -64,6 +68,7 @@ const Game = () => {
       }
       if (isTerminal(editedBoard).winner === "draw") {
         gameService.gameWin(socketService.socket, "draw");
+        setWinLine(isTerminal(editedBoard).winLine);
         setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
       }
       setPlayerTurn(false);
@@ -93,6 +98,7 @@ const Game = () => {
       }
   
       if (isTerminal(editedBoard).winner === "draw") {
+        setWinLine(isTerminal(editedBoard).winLine);
         setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
       }
     }
@@ -137,7 +143,7 @@ const Game = () => {
     }
 
     if (isFull(board)) {
-      return { winner: "draw" };
+      return { winner: "draw", winLine: [0, 1, 2, 3, 4, 5, 6, 7, 8] };
     }
 
     return { notWin :false };
@@ -249,10 +255,12 @@ const Game = () => {
   }, [resetGameState]);
 
   return (
-    <G.GameContainer>
-      {socketService.socket && !isGameStarted && <h2>기다려!</h2>}
-      {(!isGameStarted || !isPlayerTurn) && <h2>상대턴</h2>}
+    <G.Container>
+      {location.pathname !== "/computer" && !isGameStarted && <G.PlayerWait>입장 대기중 입니다.</G.PlayerWait>}
+      {location.pathname !== "/computer" && (!isGameStarted || !isPlayerTurn) && <G.PlayStopper/>}
+      <Score />
       <G.Board>
+        <G.BoardImg src={Board} alt="board"/>
         {matrix.map((val, idx) => (
           <Cell 
             key={idx}
@@ -263,8 +271,7 @@ const Game = () => {
           />
         ))}
       </G.Board>
-      <Score />
-    </G.GameContainer>
+    </G.Container>
   );
 }
 

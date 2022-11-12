@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 
-export interface IChildren {
+export interface IFrameProps {
   children: ReactNode;
+  src: string;
 }

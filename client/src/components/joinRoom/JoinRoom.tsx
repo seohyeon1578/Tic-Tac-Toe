@@ -4,6 +4,7 @@ import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
 import { inRoom } from "../../store/game/inRoom";
 import { IList } from "../../type/interfaces/room";
+import * as J from "./JoinRoom.style";
 
 const JoinRoom = () => {
   const [roomName, setRoomName] = useState("");
@@ -65,25 +66,25 @@ const JoinRoom = () => {
   }, [connect]);
 
   return (
-    <>
-      <form onSubmit={joinRoom}>
-          <input
+    <J.Container>
+      <J.Form onSubmit={joinRoom}>
+          <J.NameInput
             value={roomName}
             onChange={handleRoomNameChange}
           />
-          <button type="submit" disabled={isJoining}>
+          <J.JoiningBtn type="submit" disabled={isJoining}>
             {isJoining ? "입장중..." : "입장"}
-          </button>
-      </form>
-      <div>
-        {roomList.map((list) => (
-          <button onClick={joinRoom} value={list.name}>
-            {list.name}
-            {list.size}
-          </button>
+          </J.JoiningBtn>
+      </J.Form>
+      <J.RoomList>
+        {roomList.map((list, idx) => (
+          <J.Room onClick={joinRoom} key={idx} value={list.name}>
+            <J.RoomName>{list.name}</J.RoomName>
+            <J.RoomSize>인원: {list.size}</J.RoomSize>
+          </J.Room>
         ))}
-      </div>
-    </>
+      </J.RoomList>
+    </J.Container>
   );
 };
 

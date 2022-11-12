@@ -1,4 +1,9 @@
 import styled from "styled-components";
+import { Link } from 'react-router-dom';
+
+interface ITopProps {
+  top: string;
+}
 
 interface IWidthProps {
   width: string;
@@ -9,16 +14,24 @@ interface IColorProps extends IWidthProps {
   firstColor: string;
 }
 
-export const TitleWrap = styled.div`
+interface IBtnProps extends IColorProps{
+  borderRadius: string;
+}
+
+interface IFrameProps extends IWidthProps{
+  borderRadius: string;
+}
+
+export const TitleWrap = styled.div<ITopProps>`
   position: absolute;
-  top: 16%;
+  top: ${({ top }) => top};
   left: 50%;
   transform: translate(-50%, -50%);
 
   font-family: "ROKAF-Sans-Bold";
   color: white;
   text-align: center;
-  text-shadow: 0 2px 2px black;
+  text-shadow: 0 3px 2px black;
 
   z-index: 1;
 `;
@@ -36,7 +49,7 @@ export const MainSubtitle = styled.h3`
 `;
 
 export const MainTitle = styled.h2`
-  font-size: 6rem;
+  font-size: 5.5rem;
 `;
 
 export const CharacterImg = styled.img`
@@ -48,19 +61,19 @@ export const CharacterImg = styled.img`
   width: 40%;
 `;
 
-export const TopBtn = styled.div<IColorProps>`
+export const TopBtn = styled.div<IBtnProps>`
   position: absolute;
   top: 0%;
   
   transition: all .5s;
-  transform: translateY(-50%);
+  transform: translateY(-50%) rotateX(40deg);
   
   width: ${({ width }) => width + "rem"};
   height: 6.25rem;
   
   background: ${({ firstColor, lastColor }) => 
-                  `linear-gradient(120deg, ${firstColor}, ${lastColor})`};
-  border-radius: 50%;
+                  `linear-gradient(160deg, ${firstColor}, ${lastColor})`};
+  border-radius: ${({ borderRadius }) => borderRadius};
 
   font-family: "ROKAF-Sans-Bold";
   font-size: 3rem;
@@ -87,36 +100,36 @@ export const MiddleBtn = styled.div<IColorProps>`
   z-index: 1;
 `;
 
-export const BottomBtn = styled.div<IColorProps>`
+export const BottomBtn = styled.div<IBtnProps>`
   position: absolute;
   top: 100%;
   
-  transform: translateY(-50%);
+  transform: translateY(-50%) rotateX(40deg);
   
   width: ${({ width }) => width + "rem"};
   height: 6.25rem;
   
   background-color: ${({ firstColor }) => firstColor};
-  border-radius: 50%;
+  border-radius: ${({ borderRadius }) => borderRadius};
   
   z-index: 2;
 `;
 
-export const BtnFrame = styled.div<IWidthProps>`
+export const BtnFrame = styled.div<IFrameProps>`
   position: absolute;
   top: 100%;
   left: 50%;
 
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) rotateX(30deg);
 
   width: ${({ width }) => width + "rem"};
   height: 7rem;
 
   background-color: white;
-  border-radius: 50%;
+  border-radius: ${({ borderRadius }) => borderRadius};
 `;
 
-export const ButtonWrap = styled.div<IWidthProps>`
+export const ButtonWrap = styled(Link)<IWidthProps>`
   cursor: pointer;
   
   position: relative;
@@ -130,21 +143,34 @@ export const ButtonWrap = styled.div<IWidthProps>`
   width: ${({ width }) => width + "rem"};
   height: 2.2rem;
 
-  ${({width}) => width === "20" &&
-    `:hover {
-      ${TopBtn} {
-        top: 16%;
-      }
+  :hover {
+    ${TopBtn} {
+      top: 18%;
+    }
 
-      ${MiddleBtn} {
-        top: 64%;
-        height: 1.7rem;
-      }
-    }`
+    ${MiddleBtn} {
+      top: 66%;
+      height: 1.6rem;
+    }
   }
 `;
 
-export const OnlineBtn = styled.div`
+export const ButtonContainer = styled.div<IWidthProps>`
+  cursor: pointer;
+  
+  position: relative;
+  top: 87%;
+  left: 50%;
+  
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  
+  width: ${({ width }) => width + "rem"};
+  height: 2.2rem;
+`
+
+export const OnlineBtn = styled(Link)`
   position: relative;
   
   width: 15rem;
@@ -152,17 +178,17 @@ export const OnlineBtn = styled.div`
 
   :hover {
     ${TopBtn} {
-      top: 16%;
+      top: 18%;
     }
 
     ${MiddleBtn} {
-      top: 64%;
-      height: 1.7rem;
+      top: 66%;
+      height: 1.6rem;
     }
   }
 `;
 
-export const ComputerBtn = styled.div`
+export const ComputerBtn = styled(Link)`
   position: relative;
   
   width: 15rem;
@@ -172,12 +198,12 @@ export const ComputerBtn = styled.div`
   
   :hover {
     ${TopBtn} {
-      top: 16%;
+      top: 18%;
     }
 
     ${MiddleBtn} {
-      top: 64%;
-      height: 1.7rem;
+      top: 66%;
+      height: 1.6rem;
     }
   }
 `;

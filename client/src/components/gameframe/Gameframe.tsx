@@ -1,12 +1,11 @@
 import React from "react";
-import gameFrame from "../../assets/images/gameframe.png";
-import { IChildren } from "../../type/interfaces/frame";
+import { IFrameProps } from "../../type/interfaces/frame";
 import { Container } from "./Gameframe.style";
 
-const Gameframe = ({ children } : IChildren) => {
+const Gameframe = ({ children, src } : IFrameProps) => {
   return(
     <Container>
-      <img src={gameFrame} alt="게임 틀" className="frame"/>
+      <img src={src} alt="게임 틀" className="frame"/>
       {children}
     </Container>
   )

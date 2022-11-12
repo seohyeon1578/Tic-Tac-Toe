@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const Container = styled.div`
   position: absolute;
-  top: 88%;
+  top: 5%;
   left: 50%;
   transform: translateX(-50%);
   
@@ -18,17 +18,20 @@ export const ItemWrap = styled.div`
 `;
 
 export const Player = styled.span`
-  font-family: "Raleway",sans-serif;
-  font-size: 20px;
-  font-weight: 400;
+  font-family: "ROKAF-Sans-Bold";
+  font-size: 3rem;
+  font-weight: 500;
+  text-shadow: 0 -3px 1px black;
 `;
 
 export const Value = styled.span`
-  width: 230px;
-  height: 40px;
+  width: 10vw;
+  height: auto;
   
-  font-family:  "Raleway",sans-serif;
-  font-size: 50px;
-  font-weight: 400;
+  margin-top: 2vh;
+
+  font-family: "ROKAF-Sans-Bold";
+  font-size: 3.5rem;
+  font-weight: 500;
   text-align: center;
 `;
