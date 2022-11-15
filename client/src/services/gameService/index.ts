@@ -49,12 +49,12 @@ class GameService {
     socket.on("end_game", listiner);
   }
 
-  public async gameWin(socket: Socket, message: string) {
-    socket.emit("game_win", { message });
+  public async gameWin(socket: Socket, message: string, board: string[]) {
+    socket.emit("game_win", { message, board });
   }
 
-  public async onGameWin(socket: Socket, listiner: (message: string) => void) {
-    socket.on("on_game_win", ({ message }) => listiner(message));
+  public async onGameWin(socket: Socket, listiner: ({ message, board} : {message: string, board: string[]}) => void) {
+    socket.on("on_game_win", ({ message, board }) => listiner({ message, board }));
   }
 }
 

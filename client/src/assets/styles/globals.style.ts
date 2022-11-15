@@ -7,6 +7,23 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  html {
+    font-size: 120%;
+    -webkit-text-size-adjust: none;
+
+    @media screen and (min-device-width: 375px) {
+      font-size: 30%;
+    }
+
+    @media screen and (min-device-width: 768px) {
+        font-size: 60%;
+    }
+    
+    @media screen and (min-device-width: 1024px) {
+        font-size: 100%;
+    }
+  }
+
   body {
     height: 100vh;
   }

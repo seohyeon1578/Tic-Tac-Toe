@@ -54,20 +54,19 @@ const Game = () => {
 
     if (socketService.socket) {
       let editedBoard = [...matrix];
-      console.log(playerSymbol)
       editedBoard[id] = playerSymbol;
 
       setMatrix(editedBoard);
       gameService.updateGame(socketService.socket, editedBoard);
       if (isTerminal(editedBoard).winner === playerSymbol) {
         const symbol = playerSymbol.toLowerCase()
-        gameService.gameWin(socketService.socket, symbol);
+        gameService.gameWin(socketService.socket, symbol, editedBoard);
         setWinLine(isTerminal(editedBoard).winLine);
         setGameWin((prev) => ({...prev, [symbol]: prev[symbol] + 1}))
         return;
       }
       if (isTerminal(editedBoard).winner === "draw") {
-        gameService.gameWin(socketService.socket, "draw");
+        gameService.gameWin(socketService.socket, "draw", editedBoard);
         setWinLine(isTerminal(editedBoard).winLine);
         setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
       }
@@ -237,15 +236,15 @@ const Game = () => {
     if (socketService.socket){
       gameService.onGameWin(socketService.socket, (message) => {
         setPlayerTurn(false);
-        if(message === "draw"){
+        if(message.message === "draw"){
           setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
         }else {
-          setWinLine(isTerminal(matrix).winLine);
-          setGameWin((prev) => ({...prev, [message]: prev[message] + 1}))
+          setWinLine(isTerminal(message.board).winLine);
+          setGameWin((prev) => ({...prev, [message.message]: prev[message.message] + 1}))
         }
       });
     }
-  }, [isTerminal, matrix, setGameWin, setPlayerTurn]);
+  }, []);
 
   const handleEndGame = useCallback(() => {
     if(socketService.socket){
@@ -271,9 +270,10 @@ const Game = () => {
 
   return (
     <G.Container>
-      {location.pathname !== "/computer" && !isGameStarted && <G.PlayerWait>입장 대기중 입니다.</G.PlayerWait>}
-      {location.pathname !== "/computer" && (!isGameStarted || !isPlayerTurn) && <G.PlayStopper/>}
+      {location.pathname === "/online" && !isGameStarted && <G.PlayerWait>입장 대기중 입니다.</G.PlayerWait>}
+      {location.pathname === "/online" && (!isGameStarted || !isPlayerTurn) && <G.PlayStopper/>}
       <Score />
+      <G.Title>{location.pathname === "/online" ? '온라인 플레이' : '컴퓨터와 플레이'}</G.Title>
       <G.Board>
         <G.BoardImg src={Board} alt="board"/>
         {matrix.map((val, idx) => (

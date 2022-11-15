@@ -3,13 +3,13 @@ import { useRecoilState } from "recoil";
 import Game from "../components/game";
 import Gameframe from "../components/gameframe";
 import JoinRoom from "../components/joinRoom";
-import { inRoom } from "../store/game/inRoom";
-import JoinRoomFrame from "../assets/images/selectframe.png";
-import gameFrame from "../assets/images/gameframe.png";
-import * as O from "../assets/styles/Main.style";
 import gameService from "../services/gameService";
 import socketService from "../services/socketService";
+import { inRoom } from "../store/game/inRoom";
 import { roomId } from "../store/game/roomId";
+import JoinRoomFrame from "../assets/images/selectframe.png";
+import gameFrame from "../assets/images/gameBoardframe.png";
+import * as O from "../assets/styles/Main.style";
 
 const OnlinePage = () => {
   const [isInRoom, setInRoom] = useRecoilState(inRoom);

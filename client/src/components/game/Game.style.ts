@@ -10,6 +10,19 @@ export const Container = styled.div`
   height: 100%;
 `;
 
+export const Title = styled.h3`
+  position: absolute;
+  top: 21.7%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  font-family: "ROKAF-Sans-Bold";
+  font-size: 1.8rem;
+  font-weight: 500;
+  text-shadow: 0 -2px 2px gray;
+  color: #AAAAAA;
+`;
+
 export const Board = styled.div`
   position: relative;
   top: 50%;
@@ -36,8 +49,8 @@ export const PlayerWait = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
 
-  width: 28vw;
-  height: 18vh;
+  width: 25vw;
+  height: 20vh;
   
   background-color: #EFF2F9;
   border-radius: 15px;
@@ -46,7 +59,8 @@ export const PlayerWait = styled.div`
   font-size: 3rem;
   color: #01377E;
   text-align: center;
-  line-height: 18vh;
+  line-height: 20vh;
+  white-space: nowrap;
 
   z-index: 99;
 `;

@@ -1,7 +1,7 @@
 import React from "react";
 import Game from "../components/game";
 import Gameframe from "../components/gameframe";
-import gameFrame from "../assets/images/gameframe.png";
+import gameFrame from "../assets/images/gameBoardframe.png";
 import * as C from "../assets/styles/Main.style";
 
 const ComputerPage = () => {
