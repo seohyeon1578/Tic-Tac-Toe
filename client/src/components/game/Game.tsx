@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useRecoilState, useResetRecoilState } from "recoil";
+import usePreventLeave from "../../hooks/usePreventLeave";
+import useAudio from "../../hooks/useAudio";
 import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
 import { gameState } from "../../store/game/gameState";
@@ -12,8 +14,8 @@ import { IWinner } from "../../type/interfaces/game";
 import Cell from "../cell";
 import Score from "./score/Score";
 import Board from "../../assets/images/board.png";
+import Audio from "../../assets/audios/sound.mp3";
 import * as G from './Game.style';
-import usePreventLeave from "../../hooks/usePreventLeave";
 
 const Game = () => {
   const [matrix, setMatrix] = useState<IPlayMatrix>(Array(9).fill(""));
@@ -25,6 +27,8 @@ const Game = () => {
   const [isPlayerTurn, setPlayerTurn] = useRecoilState(turnState)
   const [isGameStarted, setGameStarted] = useRecoilState(gameStarted)
   const resetGameState = useResetRecoilState(gameState);
+  
+  const [playing, toggle, play] = useAudio(Audio);
 
   const { enablePrevent, disablePrevent } = usePreventLeave();
 
@@ -54,6 +58,8 @@ const Game = () => {
     }
 
     if (matrix[id] !== "") return;
+
+    if (playing) play();
 
     if (socketService.socket) {
       let editedBoard = [...matrix];
@@ -285,6 +291,7 @@ const Game = () => {
       {location.pathname === "/online" && !isGameStarted && <G.PlayerWait>입장 대기중 입니다.</G.PlayerWait>}
       {location.pathname === "/online" && (!isGameStarted || !isPlayerTurn) && <G.PlayStopper/>}
       <Score />
+      <button onClick={toggle}>{playing ? 'pause' : 'play'}</button>
       <G.Title>{location.pathname === "/online" 
                 ? isGameStarted 
                 ? isPlayerTurn 
