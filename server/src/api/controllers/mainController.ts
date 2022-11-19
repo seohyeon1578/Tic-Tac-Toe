@@ -2,7 +2,7 @@ import {
   ConnectedSocket, 
   OnConnect,
   SocketController, 
-  SocketIO 
+  SocketIO
 } from "socket-controllers";
 import { Socket, Server } from "socket.io";
 
