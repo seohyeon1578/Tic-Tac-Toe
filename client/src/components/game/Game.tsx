@@ -13,6 +13,7 @@ import Cell from "../cell";
 import Score from "./score/Score";
 import Board from "../../assets/images/board.png";
 import * as G from './Game.style';
+import usePreventLeave from "../../hooks/usePreventLeave";
 
 const Game = () => {
   const [matrix, setMatrix] = useState<IPlayMatrix>(Array(9).fill(""));
@@ -24,6 +25,8 @@ const Game = () => {
   const [isPlayerTurn, setPlayerTurn] = useRecoilState(turnState)
   const [isGameStarted, setGameStarted] = useRecoilState(gameStarted)
   const resetGameState = useResetRecoilState(gameState);
+
+  const { enablePrevent, disablePrevent } = usePreventLeave();
 
   const location = useLocation();
   
@@ -268,12 +271,28 @@ const Game = () => {
     resetGameState();
   }, [resetGameState]);
 
+  useEffect(() => {
+    if(socketService.socket){
+      enablePrevent();
+      return () => {
+        disablePrevent();
+      }
+    }
+  }, [disablePrevent, enablePrevent])
+
   return (
     <G.Container>
       {location.pathname === "/online" && !isGameStarted && <G.PlayerWait>입장 대기중 입니다.</G.PlayerWait>}
       {location.pathname === "/online" && (!isGameStarted || !isPlayerTurn) && <G.PlayStopper/>}
       <Score />
-      <G.Title>{location.pathname === "/online" ? '온라인 플레이' : '컴퓨터와 플레이'}</G.Title>
+      <G.Title>{location.pathname === "/online" 
+                ? isGameStarted 
+                ? isPlayerTurn 
+                ? `내 차례`
+                : `상대편 차례` 
+                : '온라인 플레이' 
+                : '컴퓨터와 플레이'
+                }</G.Title>
       <G.Board>
         <G.BoardImg src={Board} alt="board"/>
         {matrix.map((val, idx) => (
