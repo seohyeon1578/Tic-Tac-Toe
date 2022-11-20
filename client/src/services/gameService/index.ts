@@ -56,6 +56,14 @@ class GameService {
   public async onGameWin(socket: Socket, listiner: ({ message, board} : {message: string, board: string[]}) => void) {
     socket.on("on_game_win", ({ message, board }) => listiner({ message, board }));
   }
+
+  public async onWaitGame(socket: Socket) {
+    socket.emit("waiting_game");
+  }
+
+  public async finishedWait(socket: Socket, listiner: () => void) {
+    socket.on("finished_wait", listiner)
+  }
 }
 
 export default new GameService();

@@ -21,6 +21,7 @@ const Game = () => {
   const [matrix, setMatrix] = useState<IPlayMatrix>(Array(9).fill(""));
   const [nodes, setNodes] = useState<{[key: number]: any}>({});
   const [winLine, setWinLine] = useState([]);
+  const [winner, setWinner] = useState('');
   
   const [gameWin, setGameWin] = useRecoilState(gameState);
   const [playerSymbol, setPlayerSymbol] = useRecoilState(symbolState);
@@ -35,7 +36,8 @@ const Game = () => {
   const location = useLocation();
   
   const gameReset = () => {
-    setWinLine([])
+    setWinner('');
+    setWinLine([]);
     setMatrix(Array(9).fill(""));
   }
 
@@ -53,6 +55,12 @@ const Game = () => {
       isTerminal(matrix).winner === "O" ||
       isFull(matrix)
     ) {
+      if(winner !== ''){
+        setGameStarted(false);
+        if(socketService.socket){
+          gameService.onWaitGame(socketService.socket)
+        }
+      }
       gameReset();
       return;
     }
@@ -70,14 +78,17 @@ const Game = () => {
       if (isTerminal(editedBoard).winner === playerSymbol) {
         const symbol = playerSymbol.toLowerCase()
         gameService.gameWin(socketService.socket, symbol, editedBoard);
+        setWinner(symbol);
         setWinLine(isTerminal(editedBoard).winLine);
         setGameWin((prev) => ({...prev, [symbol]: prev[symbol] + 1}))
         return;
       }
       if (isTerminal(editedBoard).winner === "draw") {
         gameService.gameWin(socketService.socket, "draw", editedBoard);
+        setWinner('draw')
         setWinLine(isTerminal(editedBoard).winLine);
         setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
+        return;
       }
       setPlayerTurn(false);
     } else {
@@ -97,7 +108,6 @@ const Game = () => {
       }
       
       setMatrix(editedBoard);
-  
   
       if (isTerminal(editedBoard).winner === "O") {
         setWinLine(isTerminal(editedBoard).winLine);
@@ -245,7 +255,9 @@ const Game = () => {
     if (socketService.socket){
       gameService.onGameWin(socketService.socket, (message) => {
         setPlayerTurn(false);
+        setWinner(message.message);
         if(message.message === "draw"){
+          setWinLine(isTerminal(message.board).winLine);
           setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
         }else {
           setWinLine(isTerminal(message.board).winLine);
@@ -254,6 +266,14 @@ const Game = () => {
       });
     }
   }, []);
+
+  const handleWaitGame = useCallback(() => {
+    if(socketService.socket){
+      gameService.finishedWait(socketService.socket, () => {
+        setGameStarted(true);
+      })
+    }
+  }, [gameStarted]);
 
   const handleEndGame = useCallback(() => {
     if(socketService.socket){
@@ -271,7 +291,8 @@ const Game = () => {
     handleStartGame();
     handleGameWin();  
     handleEndGame();
-  }, [handleGameUpdate, handleStartGame, handleGameWin, handleEndGame]);
+    handleWaitGame();
+  }, [handleGameUpdate, handleStartGame, handleGameWin, handleEndGame, handleWaitGame]);
   
   useEffect(() => {
     resetGameState();
@@ -288,13 +309,17 @@ const Game = () => {
 
   return (
     <G.Container>
-      {location.pathname === "/online" && !isGameStarted && <G.PlayerWait>입장 대기중 입니다.</G.PlayerWait>}
-      {location.pathname === "/online" && (!isGameStarted || !isPlayerTurn) && <G.PlayStopper/>}
+      {location.pathname === "/online" && !isGameStarted && <G.PlayerWait>상대를 기다리는 중입니다.</G.PlayerWait>}
+      {location.pathname === "/online" && (!isGameStarted || !isPlayerTurn) && winner === '' && <G.PlayStopper/>}
       <Score />
       <button onClick={toggle}>{playing ? 'pause' : 'play'}</button>
       <G.Title>{location.pathname === "/online" 
-                ? isGameStarted 
-                ? isPlayerTurn 
+                ? isGameStarted
+                ? winner === 'draw'
+                ? '무승부'
+                : winner !== ''
+                ? `${winner} 승리`
+                : isPlayerTurn 
                 ? `내 차례`
                 : `상대편 차례` 
                 : '온라인 플레이' 

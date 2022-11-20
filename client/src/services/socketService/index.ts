@@ -24,6 +24,11 @@ class SocketService {
       });
     });
   }
+
+  public disconnect() {
+    this.socket?.close();
+    this.socket = null;
+  }
 }
 
 export default new SocketService();

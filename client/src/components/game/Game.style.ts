@@ -56,7 +56,7 @@ export const PlayerWait = styled.div`
   border-radius: 15px;
 
   font-family: "ROKAF-Sans-Bold";
-  font-size: 3rem;
+  font-size: 2rem;
   color: #01377E;
   text-align: center;
   line-height: 20vh;

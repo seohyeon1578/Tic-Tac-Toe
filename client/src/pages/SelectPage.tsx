@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Gameframe from "../components/gameframe";
 import gameFrame from "../assets/images/selectframe.png";
 import online from "../assets/images/online.png";
@@ -8,8 +8,14 @@ import {
   OnlineImg 
 } from "../assets/styles/Select.style";
   import * as S from "../assets/styles/Main.style";
+import socketService from "../services/socketService";
 
 const SelectPage = () => {
+  useEffect(() => {
+    if(socketService.socket) {
+      socketService.disconnect();
+    }
+  }, [])
   return(
     <Gameframe src={gameFrame}>
       <S.TitleWrap top="9%">
