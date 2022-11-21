@@ -4,14 +4,17 @@ import gameService from "../../services/gameService";
 import socketService from "../../services/socketService";
 import { inRoom } from "../../store/game/inRoom";
 import { roomId } from "../../store/game/roomId";
+import { nameState } from "../../store/user/nameState";
 import { IList } from "../../type/interfaces/room";
 import * as J from "./JoinRoom.style";
 
 const JoinRoom = () => {
+  const [userName, setUserName] = useState("");
   const [roomName, setRoomName] = useState("");
   const [roomList, setRoomList] = useState<IList>([]);
   const [isJoining, setJoining] = useState(false);
   
+  const [name, setName] = useRecoilState(nameState);
   const [isInRoom, setInRoom] = useRecoilState(inRoom);
   const [roomIdValue, setRoomId] = useRecoilState(roomId);
 
@@ -37,6 +40,8 @@ const JoinRoom = () => {
 
   const handleRoomNameChange = (e: React.ChangeEvent<any>) => setRoomName(e.target.value);
 
+  const handleUserNameChange = (e: React.ChangeEvent<any>) => setUserName(e.target.value);
+
   const joinRoom = async(e: React.FormEvent | React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
@@ -55,13 +60,17 @@ const JoinRoom = () => {
     setJoining(true);
 
     const joined = await gameService
-      .joinGameRoom(socket, roomId)
+      .joinGameRoom(socket, roomId, userName)
       .catch((err) => {
         console.log(err);
       });
 
     if (joined) setInRoom(true);
 
+    setName({
+      my: userName,
+      other: ''
+    });
     setJoining(false);
   };
 
@@ -71,10 +80,16 @@ const JoinRoom = () => {
 
   return (
     <J.Container>
+      <J.UserNameInput 
+        value={userName}
+        onChange={handleUserNameChange}
+        placeholder="이름"
+      />
       <J.Form onSubmit={joinRoom}>
           <J.NameInput
             value={roomName}
             onChange={handleRoomNameChange}
+            placeholder="방 이름을 입력해주세요."
           />
           <J.JoiningBtn type="submit" disabled={isJoining}>
             {isJoining ? "입장중..." : "입장"}

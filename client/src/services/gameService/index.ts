@@ -12,9 +12,9 @@ class GameService {
     socket.on("room_list", ({ list } : { list: IList}) => listiner(list))
   }
 
-  public async joinGameRoom(socket: Socket, roomId: string): Promise<boolean> {
+  public async joinGameRoom(socket: Socket, roomId: string, userName: string): Promise<boolean> {
     return new Promise((rs, rj) => {
-      socket.emit("join_game", { roomId });
+      socket.emit("join_game", { roomId, userName });
       socket.on("room_joined", () => rs(true));
       socket.on("room_join_error", ({ error }) => rj(error));
     });
@@ -49,12 +49,12 @@ class GameService {
     socket.on("end_game", listiner);
   }
 
-  public async gameWin(socket: Socket, message: string, board: string[]) {
-    socket.emit("game_win", { message, board });
+  public async gameWin(socket: Socket, message: string, board: string[], winName?: string) {
+    socket.emit("game_win", { message, board, winName });
   }
 
-  public async onGameWin(socket: Socket, listiner: ({ message, board} : {message: string, board: string[]}) => void) {
-    socket.on("on_game_win", ({ message, board }) => listiner({ message, board }));
+  public async onGameWin(socket: Socket, listiner: ({ message, board, winName } : {message: string, board: string[], winName?: string}) => void) {
+    socket.on("on_game_win", ({ message, board, winName }) => listiner({ message, board, winName }));
   }
 
   public async onWaitGame(socket: Socket) {

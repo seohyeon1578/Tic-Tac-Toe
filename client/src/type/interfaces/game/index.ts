@@ -16,4 +16,5 @@ export interface IWinner {
 export interface IStartGame {
   start: boolean;
   symbol: IPlayerSymbol;
+  name: string;
 }

@@ -16,6 +16,7 @@ import Score from "./score/Score";
 import Board from "../../assets/images/board.png";
 import Audio from "../../assets/audios/sound.mp3";
 import * as G from './Game.style';
+import { nameState } from "../../store/user/nameState";
 
 const Game = () => {
   const [matrix, setMatrix] = useState<IPlayMatrix>(Array(9).fill(""));
@@ -23,6 +24,7 @@ const Game = () => {
   const [winLine, setWinLine] = useState([]);
   const [winner, setWinner] = useState('');
   
+  const [userNames, setUserNames] = useRecoilState(nameState);
   const [gameWin, setGameWin] = useRecoilState(gameState);
   const [playerSymbol, setPlayerSymbol] = useRecoilState(symbolState);
   const [isPlayerTurn, setPlayerTurn] = useRecoilState(turnState)
@@ -77,8 +79,8 @@ const Game = () => {
       gameService.updateGame(socketService.socket, editedBoard);
       if (isTerminal(editedBoard).winner === playerSymbol) {
         const symbol = playerSymbol.toLowerCase()
-        gameService.gameWin(socketService.socket, symbol, editedBoard);
-        setWinner(symbol);
+        gameService.gameWin(socketService.socket, symbol, editedBoard, userNames.my);
+        setWinner(userNames.my);
         setWinLine(isTerminal(editedBoard).winLine);
         setGameWin((prev) => ({...prev, [symbol]: prev[symbol] + 1}))
         return;
@@ -244,22 +246,27 @@ const Game = () => {
       gameService.onStartGame(socketService.socket, (options) => {
         setGameStarted(true);
         setPlayerSymbol(options.symbol);
+        console.log(options.name) 
+        setUserNames((prev) => ({...prev, other: options.name}))
         if (options.start) setPlayerTurn(true);
         else setPlayerTurn(false);
       });
     }
-  }, [setGameStarted, setPlayerSymbol, setPlayerTurn]);
+  }, [setGameStarted, setPlayerSymbol, setPlayerTurn, setUserNames]);
 
   /** 이긴사람 확인하는 함수 */
   const handleGameWin = useCallback(() => {
     if (socketService.socket){
       gameService.onGameWin(socketService.socket, (message) => {
         setPlayerTurn(false);
-        setWinner(message.message);
         if(message.message === "draw"){
+          setWinner(message.message);
           setWinLine(isTerminal(message.board).winLine);
           setGameWin((prev) => ({...prev, draw: prev.draw + 1}))
         }else {
+          if(message.winName){
+            setWinner(message.winName);
+          }
           setWinLine(isTerminal(message.board).winLine);
           setGameWin((prev) => ({...prev, [message.message]: prev[message.message] + 1}))
         }
@@ -280,6 +287,7 @@ const Game = () => {
       gameService.onEndGame(socketService.socket, () => {
         setGameStarted(false);
         setPlayerTurn(false);
+        setUserNames((prev) => ({...prev, other: ''}));
         gameReset();
         resetGameState();
       });

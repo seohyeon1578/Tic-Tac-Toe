@@ -9,6 +9,7 @@ import {
 
 @SocketController()
 export class RoomController {
+  private userName = [];
 
   @OnMessage("get_room_list")
   public async roomList(
@@ -51,11 +52,18 @@ export class RoomController {
       });
     }else {
       await socket.join(message.roomId);
+      this.userName.push({
+        roomId: message.roomId,
+        socketId: socket.id,
+        userName: message.userName
+      });
       socket.emit("room_joined");
 
-      if(connectedSockets.size === 2){      
-        socket.emit("start_game", { start: false, symbol: "X" });
-        socket.to(message.roomId).emit("start_game", { start: true, symbol: "O" });
+      if(connectedSockets.size === 2){ 
+        const otherName = this.userName.filter((val) => val.roomId === message.roomId && val.socketId !== socket.id)[0].userName;
+            
+        socket.emit("start_game", { start: false, symbol: "X", name: otherName});
+        socket.to(message.roomId).emit("start_game", { start: true, symbol: "O", name: message.userName });
       }
     }
   }
@@ -68,6 +76,7 @@ export class RoomController {
   ) {
     console.log("leave room: ", message, "socket Id: ", socket.id);
     socket.leave(message.roomId)
+    this.userName = this.userName.filter((val) => val.socketId !== socket.id);
     socket.to(message.roomId).emit("end_game");
   }
 } 

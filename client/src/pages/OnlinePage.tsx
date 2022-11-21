@@ -10,15 +10,18 @@ import { roomId } from "../store/game/roomId";
 import JoinRoomFrame from "../assets/images/selectframe.png";
 import gameFrame from "../assets/images/gameBoardframe.png";
 import * as O from "../assets/styles/Main.style";
+import { nameState } from "../store/user/nameState";
 
 const OnlinePage = () => {
   const [isInRoom, setInRoom] = useRecoilState(inRoom);
   const [roomIdValue, setRoomId] = useRecoilState(roomId);
+  const [userNames, setUserNames] = useRecoilState(nameState);
   
   const handlerClick = () =>{
     if(socketService.socket && isInRoom){
       gameService.leaveGameRoom(socketService.socket, roomIdValue);
       setInRoom(false);
+      setUserNames({ my: '', other: '' })
     }
   };
 
