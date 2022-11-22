@@ -14,6 +14,8 @@ import { IWinner } from "../../type/interfaces/game";
 import Cell from "../cell";
 import Score from "./score/Score";
 import Board from "../../assets/images/board.png";
+import On from "../../assets/images/audio-on.png";
+import Off from "../../assets/images/audio-off.png";
 import Audio from "../../assets/audios/sound.mp3";
 import * as G from './Game.style';
 import { nameState } from "../../store/user/nameState";
@@ -246,7 +248,6 @@ const Game = () => {
       gameService.onStartGame(socketService.socket, (options) => {
         setGameStarted(true);
         setPlayerSymbol(options.symbol);
-        console.log(options.name) 
         setUserNames((prev) => ({...prev, other: options.name}))
         if (options.start) setPlayerTurn(true);
         else setPlayerTurn(false);
@@ -316,36 +317,38 @@ const Game = () => {
   }, [disablePrevent, enablePrevent])
 
   return (
-    <G.Container>
-      {location.pathname === "/online" && !isGameStarted && <G.PlayerWait>상대를 기다리는 중입니다.</G.PlayerWait>}
-      {location.pathname === "/online" && (!isGameStarted || !isPlayerTurn) && winner === '' && <G.PlayStopper/>}
-      <Score />
-      <button onClick={toggle}>{playing ? 'pause' : 'play'}</button>
-      <G.Title>{location.pathname === "/online" 
-                ? isGameStarted
-                ? winner === 'draw'
-                ? '무승부'
-                : winner !== ''
-                ? `${winner} 승리`
-                : isPlayerTurn 
-                ? `내 차례`
-                : `상대편 차례` 
-                : '온라인 플레이' 
-                : '컴퓨터와 플레이'
-                }</G.Title>
-      <G.Board>
-        <G.BoardImg src={Board} alt="board"/>
-        {matrix.map((val, idx) => (
-          <Cell 
-            key={idx}
-            id={idx}
-            value={val}
-            winLine={winLine}
-            handleClick={handleClick}
-          />
-        ))}
-      </G.Board>
-    </G.Container>
+    <>
+      <G.AudioBtn onClick={toggle}><img src={playing ? On : Off} alt={playing ? 'pause' : 'play'}/></G.AudioBtn>
+      <G.Container>
+        {location.pathname === "/online" && !isGameStarted && <G.PlayerWait>상대를 기다리는 중입니다.</G.PlayerWait>}
+        {location.pathname === "/online" && (!isGameStarted || !isPlayerTurn) && winner === '' && <G.PlayStopper/>}
+        <Score />
+        <G.Title>{location.pathname === "/online" 
+                  ? isGameStarted
+                  ? winner === 'draw'
+                  ? '무승부'
+                  : winner !== ''
+                  ? `${winner} 승리`
+                  : isPlayerTurn 
+                  ? `내 차례`
+                  : `상대편 차례` 
+                  : '온라인 플레이' 
+                  : '컴퓨터와 플레이'
+                  }</G.Title>
+        <G.Board>
+          <G.BoardImg src={Board} alt="board"/>
+          {matrix.map((val, idx) => (
+            <Cell 
+              key={idx}
+              id={idx}
+              value={val}
+              winLine={winLine}
+              handleClick={handleClick}
+            />
+          ))}
+        </G.Board>
+      </G.Container>
+    </>
   );
 }
 

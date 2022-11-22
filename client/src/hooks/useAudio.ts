@@ -6,7 +6,10 @@ const useAudio = (src: string) : [playing: boolean, toggle: () => void, play: ()
 
   const toggle = () => setPlaying((prev) => !prev);
 
-  const play = () => audio.play();
+  const play = () => {
+    audio.currentTime = 0;
+    audio.play()
+  };
 
   return [playing, toggle, play];
 }

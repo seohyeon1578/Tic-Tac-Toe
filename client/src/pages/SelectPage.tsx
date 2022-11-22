@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
+import socketService from "../services/socketService";
 import Gameframe from "../components/gameframe";
 import gameFrame from "../assets/images/selectframe.png";
 import online from "../assets/images/online.png";
 import computer from "../assets/images/computer.png";
+import left from "../assets/images/left.png"
+import right from "../assets/images/right.png"
 import { 
   ComputerImg, 
   OnlineImg 
 } from "../assets/styles/Select.style";
-  import * as S from "../assets/styles/Main.style";
-import socketService from "../services/socketService";
+import * as S from "../assets/styles/Main.style";
 
 const SelectPage = () => {
   useEffect(() => {
@@ -30,7 +32,7 @@ const SelectPage = () => {
             firstColor="#40B87B" 
             lastColor="#8FD8B1"
             borderRadius="50%"
-          ></S.TopBtn>
+          ><img src={left} alt="온라인 플레이"/></S.TopBtn>
           <S.MiddleBtn 
             width="15" 
             firstColor="#159994"
@@ -48,7 +50,7 @@ const SelectPage = () => {
             firstColor="#5A46E2" 
             lastColor="#9F78F9"
             borderRadius="50%"
-          ></S.TopBtn>
+          ><img src={right} alt="컴퓨터와 플레이"/></S.TopBtn>
           <S.MiddleBtn 
             width="15" 
             firstColor="#6247EA"

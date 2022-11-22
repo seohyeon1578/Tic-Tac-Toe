@@ -21,6 +21,8 @@ const Score = () => {
                     ? userNames.my === ''
                     ? 'Guest(X)'
                     : userNames.my + '(X)'
+                    : userNames.other === ''
+                    ? 'Guest(X)'
                     : userNames.other + '(X)'
                     : 'X'}</S.Player>
           <S.Value>{gameWin.x}</S.Value>
@@ -35,6 +37,8 @@ const Score = () => {
                     ? userNames.my === ''
                     ? 'Guest(O)'
                     : userNames.my + '(O)'
+                    : userNames.other === ''
+                    ? 'Guest(X)'
                     : userNames.other + '(O)'
                     : 'O'}</S.Player>
           <S.Value>{gameWin.o}</S.Value>

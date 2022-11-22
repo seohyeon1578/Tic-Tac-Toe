@@ -10,6 +10,20 @@ export const Container = styled.div`
   height: 100%;
 `;
 
+export const AudioBtn = styled.button`
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+
+  width: 5rem;
+  height: 5rem;
+
+  background: linear-gradient(180deg, #B74CE0 0%, #7B18B5 100%);
+  border: 5px solid #FFFFFF;
+  border-radius: 12px;
+
+`;
+
 export const Title = styled.h3`
   position: absolute;
   top: 21.7%;
